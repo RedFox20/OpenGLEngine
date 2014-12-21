@@ -1,0 +1,187 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Shader Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Frontend Files">
+      <UniqueIdentifier>{34aaaf29-9ca5-4ffe-82a7-e294ec27ed0f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="FreeType">
+      <UniqueIdentifier>{2c96d0ff-b24d-423d-9702-2faad67123c0}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="smart_ptr.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GameObject.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Texture.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GuiObject.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="VertexBuffer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="FrameBuffer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Input.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Timer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="IShaderProgram.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="main.cpp">
+      <Filter>Frontend Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Image.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GLDraw.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Vector234.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="PathfinderTest.cpp">
+      <Filter>Frontend Files</Filter>
+    </ClCompile>
+    <ClCompile Include="PathfinderAstar.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="dynamic_pool.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="FreeType.cpp">
+      <Filter>FreeType</Filter>
+    </ClCompile>
+    <ClCompile Include="FontFace.cpp">
+      <Filter>FreeType</Filter>
+    </ClCompile>
+    <ClCompile Include="FontGlyphAtlas.cpp">
+      <Filter>FreeType</Filter>
+    </ClCompile>
+    <ClCompile Include="FontBufferImage.cpp">
+      <Filter>FreeType</Filter>
+    </ClCompile>
+    <ClCompile Include="edtaa3.cpp">
+      <Filter>FreeType</Filter>
+    </ClCompile>
+    <ClCompile Include="DistanceField.cpp">
+      <Filter>FreeType</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="smart_ptr.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Texture.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GuiObject.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="VertexBuffer.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FrameBuffer.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Basetypes.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Input.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Timer.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="IShaderProgram.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GameObject.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PathfinderTest.h">
+      <Filter>Frontend Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Image.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GLDraw.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Vector234.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PathfinderAstar.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PfList.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="dynamic_pool.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PfVector.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MathEx.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FreeType.h">
+      <Filter>FreeType</Filter>
+    </ClInclude>
+    <ClInclude Include="edtaa3.h">
+      <Filter>FreeType</Filter>
+    </ClInclude>
+    <ClInclude Include="DistanceField.h">
+      <Filter>FreeType</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="bin\data\guicolor.fp.hlsl">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="bin\data\guicolor.vp.hlsl">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="bin\data\guitext.fp.hlsl">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="bin\data\guitext.vp.hlsl">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="bin\data\postprocess.fp.hlsl">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="bin\data\postprocess.vp.hlsl">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="bin\data\simple.fp.hlsl">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="bin\data\simple.vp.hlsl">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="bin\data\sdftext.fp.hlsl">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="bin\data\sdftext.vp.hlsl">
+      <Filter>Shader Files</Filter>
+    </None>
+  </ItemGroup>
+</Project>

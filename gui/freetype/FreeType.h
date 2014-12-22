@@ -6,7 +6,7 @@
 #define FREETYPE_CPP_H
 
 #include <vector>
-#include "IShaderProgram.h"
+#include "ShaderProgram.h"
 
 namespace freetype
 {
@@ -313,20 +313,10 @@ namespace freetype
 		 * @param len Length of the string
 		 * @return Number of vertices actually generated (usually != len)
 		 */
-		size_t GenBlock(VertexText* outVerts, Vector2& outSize, const wchar_t* str, size_t len);
+		size_t GenBlock(Vertex4* outVerts, Vector2& outSize, const wchar_t* str, size_t len);
 
 	};
 
-
-	/** @note Describes a simple 4D vertex */
-	struct VertexText
-	{
-		float x, y, u, v; // attribute vertex.xyuv
-		static const VertexDescr* GetVertexDescr() {
-			static VertexDescr descr = { 1, sizeof(VertexText), {4} };
-			return &descr;
-		}
-	};
 
 
 

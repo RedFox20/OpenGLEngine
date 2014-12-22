@@ -93,16 +93,16 @@ namespace freetype
 		Text* out = new Text();
 		// we generate 6 vertices instead of using an index buffer, because:
 		// 1) It uses less memory for text 2) There is no performance difference (measured with huge blocks of text)
-		VertexText* vertices = (VertexText*)alloca(sizeof(VertexText) * 6 * len);
+		Vertex4* vertices = (Vertex4*)alloca(sizeof(Vertex4) * 6 * len);
 		size_t vertexCount = GenBlock(vertices, out->size, str, len);
-		out->vb.Create<VertexText>();
+		out->vb.Create<Vertex4>();
 		out->vb.BufferVertices(vertices, vertexCount);
 		out->font = this;
 		return out;
 	}
 
 
-	size_t Font::GenBlock(VertexText* outVerts, Vector2& outSize, const wchar_t* str, size_t len)
+	size_t Font::GenBlock(Vertex4* outVerts, Vector2& outSize, const wchar_t* str, size_t len)
 	{
 		if (!atlas.IsCreated()) return NULL;
 		
@@ -115,7 +115,7 @@ namespace freetype
 		// 0\``3
 		// | \ |
 		// 1__\2
-		for (VertexText* quad = outVerts; len; --len)
+		for (Vertex4* quad = outVerts; len; --len)
 		{
 			wchar_t ch = *str++;
 			if (ch == L'\n') // newline
@@ -155,13 +155,13 @@ namespace freetype
 				float ty1 = (float)(int)g.textureY;
 
 				// *quad is indexed for cpu speed
-				quad[0].x = x0, quad[0].y = y0, quad[0].u = tx0, quad[0].v = ty0; // top left
-				quad[1].x = x0, quad[1].y = y1, quad[1].u = tx0, quad[1].v = ty1; // bottom left
-				quad[2].x = x1, quad[2].y = y1, quad[2].u = tx1, quad[2].v = ty1; // bottom right
+				quad[0].x = x0, quad[0].y = y0, quad[0].z = tx0, quad[0].w = ty0; // top left
+				quad[1].x = x0, quad[1].y = y1, quad[1].z = tx0, quad[1].w = ty1; // bottom left
+				quad[2].x = x1, quad[2].y = y1, quad[2].z = tx1, quad[2].w = ty1; // bottom right
 
 				quad[3] = quad[0]; // reuse top left
 				quad[4] = quad[2]; // reuse bottom right
-				quad[5].x = x1, quad[5].y = y0, quad[5].u = tx1, quad[5].v = ty0; // top right
+				quad[5].x = x1, quad[5].y = y0, quad[5].z = tx1, quad[5].w = ty0; // top right
 
 				vertexCount += 6;	// update actual vertex count
 				quad += 6;			// move to the next quad
@@ -190,7 +190,7 @@ namespace freetype
 	/** @return Specified glyphs XY offset */
 	Vector2 Text::GlyphXY(size_t i) const
 	{
-		VertexText* v = (VertexText*)((VertexBuffer*)&vb)->MapVBO(MAP_RO);
+		Vertex4* v = (Vertex4*)((VertexBuffer*)&vb)->MapVBO(MAP_RO);
 		float x = v[i * 6].x;
 		float y = v[i * 6].y;
 		((VertexBuffer*)&vb)->UnmapVBO();
@@ -205,7 +205,7 @@ namespace freetype
 	 */
 	void Text::Draw(const Matrix4& mvp, const Vector4& color, const Vector4& outline)
 	{
-		IShaderProgram* shader = IShaderProgram::CurrentShader();
+		ShaderProgram* shader = ShaderProgram::CurrentShader();
 		shader->BindMatrix(mvp);
 		shader->BindTexture(&font->atlas.mTexture);
 		shader->BindDiffuseColor(color);
@@ -223,7 +223,7 @@ namespace freetype
 	 */
 	void Text::Draw(uint start, uint count, const Matrix4& mvp, const Vector4& color, const Vector4& outline)
 	{
-		IShaderProgram* shader = IShaderProgram::CurrentShader();
+		ShaderProgram* shader = ShaderProgram::CurrentShader();
 		shader->BindMatrix(mvp);
 		shader->BindTexture(&font->atlas.mTexture);
 		shader->BindDiffuseColor(color);
@@ -241,7 +241,7 @@ namespace freetype
 	void Text::Create(const wchar_t* str, size_t len)
 	{
 		Vector2 sz;
-		VertexText* vertices = (VertexText*)alloca(sizeof(VertexText) * 6 * len);
+		Vertex4* vertices = (Vertex4*)alloca(sizeof(Vertex4) * 6 * len);
 		size_t vertexCount = font->GenBlock(vertices, sz, str, len);
 		vb.UpdateVertices(vertices, vertexCount);
 	}
@@ -254,7 +254,7 @@ namespace freetype
 	void Text::Append(const wchar_t* str, size_t len)
 	{
 		Vector2 sz;
-		VertexText* vertices = (VertexText*)alloca(sizeof(VertexText) * 6 * len);
+		Vertex4* vertices = (Vertex4*)alloca(sizeof(Vertex4) * 6 * len);
 		size_t vertexCount = font->GenBlock(vertices, sz, str, len);
 		vb.AppendVertices(vertices, vertexCount);
 	}
@@ -267,7 +267,7 @@ namespace freetype
 	void Text::Insert(int index, const wchar_t* str, size_t len)
 	{
 		Vector2 sz;
-		VertexText* vertices = (VertexText*)alloca(sizeof(VertexText) * 6 * len);
+		Vertex4* vertices = (Vertex4*)alloca(sizeof(Vertex4) * 6 * len);
 		size_t vertexCount = font->GenBlock(vertices, sz, str, len);
 		vb.InsertVertices(vertices, vertexCount);
 	}

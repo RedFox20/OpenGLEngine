@@ -1,12 +1,12 @@
 #version 140 // OpenGL 3.1
-attribute vec2 vertex;	// vertex position[xy] and packedRGBA[z]
+attribute vec2 position;	// vertex position
 attribute vec4 color;
 uniform mat4 transform;						// transformation matrix; also contains the depth information
 varying vec4 vColor;						// current vertex color
 
 void main(void)
 {
-	gl_Position = transform * vec4(vertex.xy, 0.0, 1.0);
+	gl_Position = transform * vec4(position.xy, 0.0, 1.0);
 	vColor = color;
 
 	//// unpackRGBA: vertex.z

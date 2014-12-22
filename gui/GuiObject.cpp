@@ -101,7 +101,7 @@
 	{
 		if (vb && vb->IsCreated())
 		{
-			IShaderProgram* shader = IShaderProgram::CurrentShader();
+			ShaderProgram* shader = ShaderProgram::CurrentShader();
 			Matrix4 transform; AffineTransform(transform);
 			shader->BindMatrix(viewProjection * transform); // upload matrix to the shader
 			//shader->BindTexture(texture);

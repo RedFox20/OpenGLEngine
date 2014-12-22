@@ -6,9 +6,9 @@
 #include "GL\glut.h"
 
 static const VertexBuffer* CurrentVertexBuffer = NULL;
-static const VertexBuffer* CurrentIndexBuffer = NULL;
-#define BindVertexBuffer() if(CurrentVertexBuffer != this) { glBindBuffer(GL_ARRAY_BUFFER, VBO); CurrentVertexBuffer = this; }
-#define BindIndexBuffer() if(CurrentIndexBuffer != this) { glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IBO); CurrentIndexBuffer = this; }
+static const VertexBuffer* CurrentIndexBuffer  = NULL;
+#define BindVertexBuffer() if (CurrentVertexBuffer != this) { glBindBuffer(GL_ARRAY_BUFFER, VBO);         CurrentVertexBuffer = this; }
+#define BindIndexBuffer()  if (CurrentIndexBuffer != this)  { glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IBO); CurrentIndexBuffer  = this; }
 
 
 
@@ -18,7 +18,7 @@ static const VertexBuffer* CurrentIndexBuffer = NULL;
 	 */
 	VertexBuffer::~VertexBuffer()
 	{
-		if(VBO) 
+		if (VBO) 
 		{
 			if(this == CurrentVertexBuffer) CurrentVertexBuffer = NULL;
 			glDeleteBuffers(1, &VBO);
@@ -31,7 +31,7 @@ static const VertexBuffer* CurrentIndexBuffer = NULL;
 	 */
 	VertexBuffer& VertexBuffer::operator=(VertexBuffer& vb)
 	{
-		if(this != &vb)
+		if (this != &vb)
 		{
 			VBO = vb.VBO, Descr = vb.Descr, VertexCount = vb.VertexCount, Type = vb.Type, Style = vb.Style;
 			vb.VBO = 0, vb.Descr = 0, vb.VertexCount = 0, vb.Type = BUFFER_INVALID, vb.Style = DRAW_INVALID;
@@ -51,15 +51,15 @@ static const VertexBuffer* CurrentIndexBuffer = NULL;
 	 */
 	bool VertexBuffer::Create(const VertexDescr* vdescr, BufferType type, DrawStyle dstyle)
 	{
-		if(VBO) return false; // already created
+		if (VBO) return false; // already created
 		Descr = vdescr;
-		Type = type;
-		switch(dstyle) {
-			case DRAW_TRIANGLES: Style = GL_TRIANGLES; break;
+		Type  = type;
+		switch (dstyle) {
+			case DRAW_TRIANGLES:      Style = GL_TRIANGLES;      break;
 			case DRAW_TRIANGLE_STRIP: Style = GL_TRIANGLE_STRIP; break;
-			case DRAW_TRIANGLE_FAN: Style = GL_TRIANGLE_FAN; break;
-			case DRAW_LINES: Style = GL_LINES; break;
-			case DRAW_LINE_STRIP: Style = GL_LINE_STRIP; break;
+			case DRAW_TRIANGLE_FAN:   Style = GL_TRIANGLE_FAN;   break;
+			case DRAW_LINES:          Style = GL_LINES;          break;
+			case DRAW_LINE_STRIP:     Style = GL_LINE_STRIP;     break;
 		}
 		return true;
 	}
@@ -70,7 +70,7 @@ static const VertexBuffer* CurrentIndexBuffer = NULL;
 	 */
 	void VertexBuffer::Destroy()
 	{
-		if(VBO)
+		if (VBO)
 		{
 			glDeleteBuffers(1, &VBO);
 			VBO = 0;
@@ -78,26 +78,27 @@ static const VertexBuffer* CurrentIndexBuffer = NULL;
 		}
 	}
 
-
+	
 	/**
 	 * @brief Binds this VertexBuffer's attributes to the shader
 	 */
 	void VertexBuffer::_Bind() const
 	{
 		BindVertexBuffer();
-		int numAttributes = Descr->Attributes;
+		int nummAttribs  = Descr->Count;
 		int sizeOfVertex = Descr->SizeOf;
 		int attrOffset = 0;
-		for(int a = 0; a < numAttributes; a++) {
-			int elemCount = Descr->ElementCount[a];
-			glVertexAttribPointer(a,
-				elemCount,		// number of float elements in a single vertex
+		for (int i = 0; i < nummAttribs; ++i)
+		{
+			auto& am = Descr->Attribs[i];
+			glVertexAttribPointer(am.attr, // bind to attribute such as a_Position
+				am.size,		// number of float elements in a single vertex
 				GL_FLOAT,		// we only deal with floats
 				GL_FALSE,		// no normalization
 				sizeOfVertex,	// stride in sizeof a single vertex
 				(void*)(sizeof(float)*attrOffset) // attribute offset
 			);
-			attrOffset += elemCount;
+			attrOffset += am.size;
 		}
 	}
 
@@ -121,8 +122,8 @@ static const VertexBuffer* CurrentIndexBuffer = NULL;
 	{
 		_Bind(); // we're using auto-bind now
 		int available = VertexCount - start;
-		if(count > available) count = available;
-		if(count) glDrawArrays(Style, start, count);
+		if (count > available) count = available;
+		if (count) glDrawArrays(Style, start, count);
 	}
 
 
@@ -158,14 +159,14 @@ static const VertexBuffer* CurrentIndexBuffer = NULL;
 	 */
 	void VertexBuffer::BufferVertices(const void* vertices, int vertexCount)
 	{
-		if(!VBO) glGenBuffers(1, &VBO);
-		if(!vertices || !vertexCount) return; // nothing to do here
+		if (!VBO) glGenBuffers(1, &VBO);
+		if (!vertices || !vertexCount) return; // nothing to do here
 
 		GLenum bufferType;
-		switch(this->Type) {
+		switch (this->Type) {
 			case BUFFER_DYNAMIC: bufferType = GL_DYNAMIC_DRAW; break;
-			case BUFFER_STREAM: bufferType = GL_STREAM_DRAW; break;
-			default: bufferType = GL_STATIC_DRAW; break;
+			case BUFFER_STREAM:  bufferType = GL_STREAM_DRAW;  break;
+			default:             bufferType = GL_STATIC_DRAW;  break;
 		}
 
 		VertexCount = vertexCount;
@@ -182,7 +183,7 @@ static const VertexBuffer* CurrentIndexBuffer = NULL;
 	 */
 	void VertexBuffer::UpdateVertices(const void* vertices, int vertexCount)
 	{
-		if(!VBO || !vertices || !vertexCount)
+		if (!VBO || !vertices || !vertexCount)
 			return; // nothing to do here
 		if(vertexCount <= VertexCount) // new size is smaller - we don't need to resize anything
 		{
@@ -206,7 +207,7 @@ static const VertexBuffer* CurrentIndexBuffer = NULL;
 	 */
 	void VertexBuffer::InsertVertices(const void* vertices, int vertexCount, int offsetIndex)
 	{
-		if(!VBO || !vertices || !vertexCount)
+		if (!VBO || !vertices || !vertexCount)
 			return;
 
 		int sizeOf = Descr->SizeOf;
@@ -224,7 +225,7 @@ static const VertexBuffer* CurrentIndexBuffer = NULL;
 
 		glBufferData(GL_ARRAY_BUFFER, newSize, data, GL_DYNAMIC_DRAW);
 		VertexCount += vertexCount;
-		if(newSize > 65536) free(data);
+		if (newSize > 65536) free(data);
 	}
 
 
@@ -236,7 +237,7 @@ static const VertexBuffer* CurrentIndexBuffer = NULL;
 	 */
 	void VertexBuffer::AppendVertices(const void* vertices, int vertexCount)
 	{
-		if(!VBO || !vertices || !vertexCount)
+		if (!VBO || !vertices || !vertexCount)
 			return;
 
 		int sizeOf = Descr->SizeOf;
@@ -252,7 +253,7 @@ static const VertexBuffer* CurrentIndexBuffer = NULL;
 
 		glBufferData(GL_ARRAY_BUFFER, newSize, data, GL_DYNAMIC_DRAW);
 		VertexCount += vertexCount;
-		if(newSize > 65536) free(data);
+		if (newSize > 65536) free(data);
 	}
 
 	/**
@@ -260,9 +261,9 @@ static const VertexBuffer* CurrentIndexBuffer = NULL;
 	 */
 	VertexIndexBuffer::~VertexIndexBuffer()
 	{
-		if(IBO) 
+		if (IBO) 
 		{
-			if(this == CurrentIndexBuffer) CurrentIndexBuffer = NULL;
+			if (this == CurrentIndexBuffer) CurrentIndexBuffer = NULL;
 			glDeleteBuffers(1, &IBO);
 		}
 
@@ -273,7 +274,7 @@ static const VertexBuffer* CurrentIndexBuffer = NULL;
 	 */
 	VertexIndexBuffer& VertexIndexBuffer::operator=(VertexIndexBuffer& vib)
 	{
-		if(this != &vib)
+		if (this != &vib)
 		{
 			VertexBuffer::operator=(vib);
 			IBO = vib.IBO, IndexCount = vib.IndexCount;
@@ -289,7 +290,7 @@ static const VertexBuffer* CurrentIndexBuffer = NULL;
 	void VertexIndexBuffer::Destroy()
 	{
 		VertexBuffer::Destroy(); // we need to also destroy the VertexBuffer
-		if(IBO)
+		if (IBO)
 		{
 			glDeleteBuffers(1, &IBO); // delete IBO
 			IBO = 0;
@@ -320,8 +321,8 @@ static const VertexBuffer* CurrentIndexBuffer = NULL;
 		_Bind(); // we're using auto-bind now
 		BindIndexBuffer(); // bind index buffer (if needed)
 		int available = IndexCount - start;
-		if(count > available) count = available;
-		if(count) glDrawRangeElements(Style, start, IndexCount, count, GL_UNSIGNED_INT, NULL);
+		if (count > available) count = available;
+		if (count) glDrawRangeElements(Style, start, IndexCount, count, GL_UNSIGNED_INT, NULL);
 	}
 
 
@@ -357,15 +358,15 @@ static const VertexBuffer* CurrentIndexBuffer = NULL;
 	 */
 	void VertexIndexBuffer::BufferIndices(const Index* indices, int indexCount)
 	{
-		if(!IBO)
+		if (!IBO)
 			glGenBuffers(1, &IBO);
-		else if(Type == BUFFER_STATIC)
+		else if (Type == BUFFER_STATIC)
 			return; // can't change a static buffer
-		if(!indices || !indexCount)
+		if (!indices || !indexCount)
 			return; // nothing to do here
 
 		GLenum bufferType;
-		switch(this->Type) {
+		switch (this->Type) {
 			case BUFFER_DYNAMIC: bufferType = GL_DYNAMIC_DRAW; break;
 			case BUFFER_STREAM: bufferType = GL_STREAM_DRAW; break;
 			default: bufferType = GL_STATIC_DRAW; break;
@@ -385,9 +386,9 @@ static const VertexBuffer* CurrentIndexBuffer = NULL;
 	 */
 	void VertexIndexBuffer::BufferSubIndices(const Index* indices, int indexCount, int offsetIndex)
 	{
-		if(!IBO || Type == BUFFER_STATIC)
+		if (!IBO || Type == BUFFER_STATIC)
 			return; // nothind to do here
-		if(!indices || !indexCount)
+		if (!indices || !indexCount)
 			return; // nothing to do here
 
 		throw "BufferSubIndices is unimplemented!";

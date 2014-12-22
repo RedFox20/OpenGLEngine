@@ -12,21 +12,24 @@
     <Filter Include="Frontend Files">
       <UniqueIdentifier>{34aaaf29-9ca5-4ffe-82a7-e294ec27ed0f}</UniqueIdentifier>
     </Filter>
-    <Filter Include="FreeType">
-      <UniqueIdentifier>{2c96d0ff-b24d-423d-9702-2faad67123c0}</UniqueIdentifier>
+    <Filter Include="Source Files\utils">
+      <UniqueIdentifier>{6441a637-b79b-4cf3-9206-8890e2f57c2d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\memory">
+      <UniqueIdentifier>{4d908d5b-68b1-4077-8d95-0d05cfaac03b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\gui">
+      <UniqueIdentifier>{3f57f7f0-2655-43d4-ac29-417e83fab620}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\gui\freetype">
+      <UniqueIdentifier>{2230fb6c-868b-42b1-a073-f5da05f7bfa4}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="smart_ptr.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="GameObject.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Texture.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="GuiObject.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="VertexBuffer.cpp">
@@ -39,9 +42,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Timer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="IShaderProgram.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="main.cpp">
@@ -65,33 +65,51 @@
     <ClCompile Include="dynamic_pool.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="FreeType.cpp">
-      <Filter>FreeType</Filter>
+    <ClCompile Include="utils\fnv.cpp">
+      <Filter>Source Files\utils</Filter>
     </ClCompile>
-    <ClCompile Include="FontFace.cpp">
-      <Filter>FreeType</Filter>
+    <ClCompile Include="utils\token.cpp">
+      <Filter>Source Files\utils</Filter>
     </ClCompile>
-    <ClCompile Include="FontGlyphAtlas.cpp">
-      <Filter>FreeType</Filter>
+    <ClCompile Include="utils\utf8.cpp">
+      <Filter>Source Files\utils</Filter>
     </ClCompile>
-    <ClCompile Include="FontBufferImage.cpp">
-      <Filter>FreeType</Filter>
+    <ClCompile Include="memory\smart_ptr.cpp">
+      <Filter>Source Files\memory</Filter>
     </ClCompile>
-    <ClCompile Include="edtaa3.cpp">
-      <Filter>FreeType</Filter>
+    <ClCompile Include="gui\freetype\DistanceField.cpp">
+      <Filter>Source Files\gui\freetype</Filter>
     </ClCompile>
-    <ClCompile Include="DistanceField.cpp">
-      <Filter>FreeType</Filter>
+    <ClCompile Include="gui\freetype\edtaa3.cpp">
+      <Filter>Source Files\gui\freetype</Filter>
+    </ClCompile>
+    <ClCompile Include="gui\freetype\FontBufferImage.cpp">
+      <Filter>Source Files\gui\freetype</Filter>
+    </ClCompile>
+    <ClCompile Include="gui\freetype\FontFace.cpp">
+      <Filter>Source Files\gui\freetype</Filter>
+    </ClCompile>
+    <ClCompile Include="gui\freetype\FontGlyphAtlas.cpp">
+      <Filter>Source Files\gui\freetype</Filter>
+    </ClCompile>
+    <ClCompile Include="gui\GuiObject.cpp">
+      <Filter>Source Files\gui</Filter>
+    </ClCompile>
+    <ClCompile Include="gui\freetype\FreeType.cpp">
+      <Filter>Source Files\gui\freetype</Filter>
+    </ClCompile>
+    <ClCompile Include="utils\console.cpp">
+      <Filter>Source Files\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="utils\file_io.cpp">
+      <Filter>Source Files\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="ShaderProgram.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="smart_ptr.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
     <ClInclude Include="Texture.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="GuiObject.h">
       <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="VertexBuffer.h">
@@ -107,9 +125,6 @@
       <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="Timer.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="IShaderProgram.h">
       <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="GameObject.h">
@@ -142,14 +157,50 @@
     <ClInclude Include="MathEx.h">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="FreeType.h">
-      <Filter>FreeType</Filter>
+    <ClInclude Include="utils\fnv.h">
+      <Filter>Source Files\utils</Filter>
     </ClInclude>
-    <ClInclude Include="edtaa3.h">
-      <Filter>FreeType</Filter>
+    <ClInclude Include="utils\token.h">
+      <Filter>Source Files\utils</Filter>
     </ClInclude>
-    <ClInclude Include="DistanceField.h">
-      <Filter>FreeType</Filter>
+    <ClInclude Include="utils\utf8.h">
+      <Filter>Source Files\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="memory\smart_ptr.h">
+      <Filter>Source Files\memory</Filter>
+    </ClInclude>
+    <ClInclude Include="gui\freetype\DistanceField.h">
+      <Filter>Source Files\gui\freetype</Filter>
+    </ClInclude>
+    <ClInclude Include="gui\freetype\edtaa3.h">
+      <Filter>Source Files\gui\freetype</Filter>
+    </ClInclude>
+    <ClInclude Include="gui\freetype\FontFace.h">
+      <Filter>Source Files\gui\freetype</Filter>
+    </ClInclude>
+    <ClInclude Include="gui\GuiObject.h">
+      <Filter>Source Files\gui</Filter>
+    </ClInclude>
+    <ClInclude Include="gui\freetype\FreeType.h">
+      <Filter>Source Files\gui\freetype</Filter>
+    </ClInclude>
+    <ClInclude Include="gui\freetype.h">
+      <Filter>Source Files\gui</Filter>
+    </ClInclude>
+    <ClInclude Include="utils\console.h">
+      <Filter>Source Files\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="utils\file_io.h">
+      <Filter>Source Files\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="utils\binary_reader.h">
+      <Filter>Source Files\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="utils\binary_writer.h">
+      <Filter>Source Files\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="ShaderProgram.h">
+      <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

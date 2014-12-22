@@ -1,5 +1,5 @@
 #version 140 // OpenGL 3.1
-attribute vec4 vertex;	// vertex position[xy] and texture coord[zw]
+attribute vec4 vertex;	// vertex position[xy], texture coord[zw]
 uniform mat4 transform;						// transformation matrix; also contains the depth information
 uniform sampler2D diffuseTex;				// alpha mapped texture 
 varying vec2 vCoord;						// out vertex texture coord for frag

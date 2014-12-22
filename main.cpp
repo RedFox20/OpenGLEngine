@@ -9,12 +9,12 @@
 #include "GL\glm\gtx\transform.hpp" // perspective, lookAt
 
 // engine specifics:
-#include "IShaderProgram.h"
+#include "ShaderProgram.h"
 #include "Timer.h"
-#include "GuiObject.h"
+#include <gui/GuiObject.h>
 #include "GameObject.h"
 #include "Input.h"
-#include "FreeType.h"
+#include <gui/freetype.h>
 using namespace freetype;
 #include "PathfinderTest.h"
 
@@ -94,7 +94,7 @@ struct GameCube : public GameObject
 ///////////////////// engine state, startup / shutdown initialization
 static bool VSync = true;
 static std::vector<GameObject*> GameObjects;
-static std::vector<IShaderProgram*> Shaders;
+static std::vector<ShaderProgram*> Shaders;
 static std::vector<Texture*> Textures;
 static std::vector<FontFace*> FontFaces;
 static std::vector<Font*> Fonts;
@@ -115,16 +115,17 @@ bool startup()
 		return false;
 	}
 
-	glClearColor(0.15f, 0.15f, 0.15f, 1.0f); // clear background to soft black
+	//glClearColor(0.15f, 0.15f, 0.15f, 1.0f); // clear background to soft black
+	glClearColor(1.0f, 1.0f, 1.0f, 1.0f); // pure white background
 	glEnable(GL_BLEND); // enable alpha mapping
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	// load shaders
-	Shaders.push_back(new MaterialShader("simple.vp.hlsl", "simple.fp.hlsl"));
-	Shaders.push_back(new TextShader2D("guitext.vp.hlsl", "guitext.fp.hlsl"));
-	Shaders.push_back(new ColorShader2D("guicolor.vp.hlsl", "guicolor.fp.hlsl"));
-	Shaders.push_back(new TextShader2D("sdftext.vp.hlsl", "sdftext.fp.hlsl"));
-	for (IShaderProgram* shader : Shaders) if(!shader->Compile()) return false;
+	Shaders.push_back(new ShaderProgram("simple.vp.hlsl", "simple.fp.hlsl"));
+	Shaders.push_back(new ShaderProgram("guitext.vp.hlsl", "guitext.fp.hlsl"));
+	Shaders.push_back(new ShaderProgram("guicolor.vp.hlsl", "guicolor.fp.hlsl"));
+	Shaders.push_back(new ShaderProgram("sdftext.vp.hlsl", "sdftext.fp.hlsl"));
+	for (ShaderProgram* shader : Shaders) if(!shader->Compile()) return false;
 	SID_SimpleShader = 0;
 	SID_TextShader2D = 1;
 	SID_ColorShader2D = 2;
@@ -197,7 +198,7 @@ void shutdown()
 {
 	glutDestroyWindow(1);
 	for (GameObject* obj : GameObjects)	   delete obj;
-	for (IShaderProgram* shader : Shaders) delete shader;
+	for (ShaderProgram* shader : Shaders)  delete shader;
 	for (Texture* texture : Textures)      delete texture;
 	for (Font* font : Fonts)               delete font;
 	for (FontFace* fontface : FontFaces)   delete fontface;
@@ -358,8 +359,9 @@ void frame_start()
 		{
 			for (GuiText* text : GuiTexts)
 			{
-				if (!text->Font()->is_sdf) Shaders[SID_TextShader2D]->Bind();
-				else Shaders[SID_SDFTextShader2D]->Bind();
+				ShaderProgram* shader = Shaders[text->Font()->is_sdf ? SID_SDFTextShader2D : SID_TextShader2D];
+				shader->HotLoad(); // perform hotloading if needed
+				shader->Bind();
 
 				Vector2 pos = text->Pos();
 				Vector2 scale = text->Scale();

@@ -151,6 +151,7 @@ namespace freetype
 		mPackX += glyphWidth + 16; // +16 pixel padding between chars
 		mHeight = mPackY + mPackHeight;
 
+		//// @brief Render glyph to texture
 		switch (mStyle)
 		{
 			case FONT_PLAIN:
@@ -165,10 +166,19 @@ namespace freetype
 			{
 				FT_Render_Glyph(face->glyph, FT_RENDER_MODE_NORMAL);
 				FT_Bitmap& b = face->glyph->bitmap;
-				img.InitImage(b.width + mPadding, b.rows + mPadding, 1);
-				img.SetSubImage(0, mPadding, b.width, b.rows, b.buffer);
-				// for shadows we just blit a copy of the original image to the background.
-				//img.MaskSubImage(mPadding, 0, b.width, b.rows, b.buffer);
+
+				if (!font->is_sdf) // regular (old) bitmap fonts:
+				{
+					img.InitImage(b.width + mPadding, b.rows + mPadding, 1);
+					img.SetSubImage(0, mPadding, b.width, b.rows, b.buffer);
+					// for shadows we just blit a copy of the original image to the background.
+					img.MaskSubImage(mPadding, 0, b.width, b.rows, b.buffer);
+				}
+				else // SDF fonts only 1 channel right now
+				{
+					img.InitImage(b.width + mPadding, b.rows + mPadding, 1);
+					img.SetSubImage(0, mPadding, b.width, b.rows, b.buffer);
+				}
 				break;
 			}
 			case FONT_OUTLINE:
@@ -180,7 +190,6 @@ namespace freetype
 				FT_Bitmap& b = FT_BitmapGlyph(strokeGlyph)->bitmap;
 				img.InitImage(b.width, b.rows, 1);
 				img.SetSubImage(0, 0, b.width, b.rows, b.buffer);
-				
 				break;
 			}
 			case FONT_STROKE:
@@ -196,12 +205,17 @@ namespace freetype
 				FT_Bitmap* b = &face->glyph->bitmap;                 // main bitmap
 				FT_Bitmap* s = &FT_BitmapGlyph(strokeGlyph)->bitmap; // stroke bitmap
 
-				img.InitImage(s->width, s->rows, 1);
-				img.SetSubImage(padLeft, padBottom, b->width, b->rows, b->buffer);
-				//img.MaskSubImage0(0, 0, s->width, s->rows, s->buffer); // mask stroke
-
-				//img.MaskSubImage(0, 0, s->width, s->rows, s->buffer); // mask shadow under the main img
-
+				if (!font->is_sdf) // regular (old) bitmap fonts:
+				{
+					img.InitImage(s->width, s->rows, 2);
+					img.SetSubImage(padLeft, padBottom, b->width, b->rows, b->buffer);
+					img.MaskSubImage(0, 0, s->width, s->rows, s->buffer); // mask stroke
+				}
+				else // SDF fonts only 1 channel right now
+				{
+					img.InitImage(s->width, s->rows, 1);
+					img.SetSubImage(padLeft, padBottom, b->width, b->rows, b->buffer);
+				}
 				break;
 			}
 		}
@@ -245,6 +259,7 @@ namespace freetype
 
 		this->font = font;
 		SelectFaceSize();
+		font->is_sdf = true;
 
 		FT_Face face = FT_Face(font->face->ftFace);
 		uint maxGlyphWidth = ((face->bbox.xMax - face->bbox.xMin) * (fontHeight+1)) / face->units_per_EM;
@@ -303,7 +318,7 @@ namespace freetype
 
 		// create and render the glyphs
 		mGlyphs.resize(cgCount);
-		vector<BufferImage> renderedGlyphs(cgCount);
+		std::vector<BufferImage> renderedGlyphs(cgCount);
 		for (int i = 0; i < cgCount; ++i)
 		{
 			auto& c = cg[i];
@@ -314,30 +329,34 @@ namespace freetype
 		// number of channels in the bufferimage
 		// PLAIN and OUTLINE only use 1 channel
 		// SHADOW and STROKE use 2 channels
-		int channels = (style == FONT_SHADOW || style == FONT_STROKE) ? 2 : 1;
+		// SDF fonts use 1 channel
+		int channels = font->is_sdf ? 1 : (style == FONT_SHADOW || style == FONT_STROKE) ? 2 : 1;
 
 		/// create a temp buffer image for blitting the shadows and outlines
 		/// @note Remember - shadows/strokes mustn't fall under the main channel, so they're blitted.
-		BufferImage image(mWidth, mHeight, 1);
+		BufferImage image(mWidth, mHeight, channels);
 
 		// now for each glyph, we render it into the texture
 		for (int i = 0; i < cgCount; ++i)
 			RenderGlyph(image, mGlyphs[i], renderedGlyphs[i]);
 
-		//BufferImage cdf(image.Width, image.Height, 1);
-		//memcpy(cdf.Data, image.Data, image.Width*image.Height);
-		//convert_to_sdf(cdf.Width, cdf.Height, (byte*)cdf.Data, 4.0f);
+		if (font->is_sdf)
+		{
+			//BufferImage cdf(image.Width, image.Height, 1);
+			//memcpy(cdf.Data, image.Data, image.Width*image.Height);
+			//convert_to_sdf(cdf.Width, cdf.Height, (byte*)cdf.Data, 4.0f);
 
-		BufferImage mdm;
-		mdm.Data = (BufferImage::Pixel*)make_distance_map((byte*)image.Data, image.Width, image.Height);
-		mdm.Width = image.Width;
-		mdm.Height = image.Height;
-		mdm.Channels = image.Channels;
-
-		BufferImage& st = mdm;
-
-		PixelFormat pf = true || channels == 1 ? FMT_R : FMT_RG;
-		mTexture = Texture(st.Data, st.Width, st.Height, pf);
+			BufferImage mdm;
+			mdm.Data = (BufferImage::Pixel*)make_distance_map((byte*)image.Data, image.Width, image.Height);
+			mdm.Width = image.Width;
+			mdm.Height = image.Height;
+			mdm.Channels = image.Channels;
+			mTexture = Texture(mdm.Data, mdm.Width, mdm.Height, FMT_R);
+		}
+		else
+		{
+			mTexture = Texture(image.Data, image.Width, image.Height, channels == 1 ? FMT_R : FMT_RG);
+		}
 	}
 
 
@@ -365,7 +384,7 @@ namespace freetype
 		SelectFaceSize();
 
 		// generate all the required glyphs
-		vector<BufferImage> renderedGlyphs(count);
+		std::vector<BufferImage> renderedGlyphs(count);
 		for (int i = 0; i < count; i++)
 		{
 			wchar_t ch = gen[i];

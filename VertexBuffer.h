@@ -9,50 +9,95 @@
 
 
 /**
- * @note Vertex description structure. Attributes count, SizeOf vertex (in bytes), Descr array 
+ * @brief ShaderProgram uniform slots
  */
-struct VertexDescr
+enum ShaderUniform
 {
-	byte Attributes;		// number of attributes per vertex
-	byte SizeOf;			// size of vertex in bytes
-	byte ElementCount[4];	// vertex element count descriptor (max 4)
+	u_Transform,    // uniform matrix transform;      model-view-project matrix
+	u_DiffuseTex,   // uniform sampler2D diffuseTex;  diffuse texture
+	u_SpecularTex,  // uniform sampler2D specularTex; specular texture
+	u_NormalTex,    // uniform sampler2D normalTex;   normal texture
+	u_ShadowTex,    // uniform sampler2D shadowTex;   shadow texture
+	u_OccludeTex,   // uniform sampler2D occludeTex;  occlusion texture for fake SSAO
+	u_DiffuseColor, // uniform vec4 diffuseColor;     diffuse color 
+	u_OutlineColor, // uniform vec4 outlineColor;     background or outline color
+	u_MaxUniforms,  // uniform counter
 };
 
 
 /**
+ * @brief ShaderProgram attribute slots
+ */
+enum ShaderAttribute
+{
+	a_Position,      // attribute vec3 position;  position (vec2 XY or vec3 XYZ)
+	a_Normal,        // attribute vec3 normal;    normal 
+	a_Coord,         // attribute vec2 coord;     texture coordinate 0
+	a_Coord2,        // attribute vec2 coord2;    texture coordinate 1
+	a_Vertex,        // attribute vec4 vertex;    additional generic 4D vertex
+	a_Color,         // attribute vec4 color;     per-vertex coloring
+	a_MaxAttributes, // attribute counter
+};
+
+
+
+
+#pragma pack(push, 1)
+/**
+ * @note Vertex description structure. Attributes count, SizeOf vertex (in bytes), Descr array 
+ */
+struct VertexDescr
+{
+	byte Count;      // number of attributes per vertex
+	byte SizeOf;     // size of vertex in bytes
+	struct AttribMap
+	{
+		byte attr; // ShaderAttribute type, such as a_Position
+		byte size; // attribute element count (number of floats to bind)
+	} Attribs[3];
+};
+#pragma pack(pop)
+
+
+
+
+/**
  * @note Describes a simple 3D vertex
+ * @note Attributes a_Vertex
  */
 struct Vertex3
 {
 	float x, y, z; // vertex.xyz
 	static const VertexDescr* GetVertexDescr() {
-		static VertexDescr descr = { 1, sizeof(Vertex3), {3} };
+		static VertexDescr descr = { 1, sizeof(Vertex3), {{a_Vertex,3}} };
 		return &descr;
 	}
 };
 
 /**
  * @note Describes a vertex-colored 3D vertex
+ * @note Attributes a_Vertex
  */
 struct Vertex3Color
 {
 	float x, y, z;	// vertex.xyz
 	float rgba;		// packedRGBA
 	static const VertexDescr* GetVertexDescr() {
-		static VertexDescr descr = { 1, sizeof(Vertex3Color), {4} };
+		static VertexDescr descr = { 1, sizeof(Vertex3Color), {{a_Vertex,4}} };
 		return &descr;
 	}
 };
 
 /**
  * @note Describes a 3D vertex with UV coordinates
+ * @note Attributes a_Position, a_Coord
  */
 struct Vertex3UV
 {
 	float x, y, z;	// attribute position.xyz
 	float u, v;		// attribute coord.uv
 	static const VertexDescr* GetVertexDescr() {
-		static VertexDescr descr = { 2, sizeof(Vertex3UV), {3,2} };
+		static VertexDescr descr = { 2, sizeof(Vertex3UV), {{a_Position,3},{a_Coord,2}} };
 		return &descr;
 	}
 };
@@ -62,56 +107,71 @@ struct Vertex3UV
 
 /**
  * @note Describes a simple 2D vertex
+ * @note Attributes a_Position
  */
 struct Vertex2
 {
 	float x, y; // attribute position.xy
 	static const VertexDescr* GetVertexDescr() {
-		static VertexDescr descr = { 1, sizeof(Vertex2), {2} };
+		static VertexDescr descr = { 1, sizeof(Vertex2), {{a_Position,2}} };
 		return &descr;
 	}
 };
 
 /**
  * @note Describes a 2D vertex with per-vertex coloring
+ * @note Attributes a_Position
  */
 struct Vertex2Color
 {
 	float x, y; // attribute position.xy
 	float rgba;	// packedRGBA
 	static const VertexDescr* GetVertexDescr() {
-		static VertexDescr descr = { 1, sizeof(Vertex2Color), {3} };
+		static VertexDescr descr = { 1, sizeof(Vertex2Color), {{a_Position,3}} };
 		return &descr;
 	}
 };
 
 /**
  * @note Describes a 2D vertex with per-vertex coloring
+ * @note Attributes a_Position, a_Color
  */
 struct Vertex2ColorUnpacked
 {
 	float x, y;			// attribute position.xy
 	Vector4 rgba;
 	static const VertexDescr* GetVertexDescr() {
-		static VertexDescr descr = { 2, sizeof(Vertex2ColorUnpacked), {2,4} };
+		static VertexDescr descr = { 2, sizeof(Vertex2ColorUnpacked), {{a_Position,2},{a_Color,4}} };
 		return &descr;
 	}
 };
 
 /**
  * @note Describes a 2D vertex with UV coordinates
+ * @note Attributes a_Position, a_Coord
  */
 struct Vertex2UV
 {
 	float x, y; // attribute position.xy
 	float u, v; // attribute coord.uv
 	static const VertexDescr* GetVertexDescr() {
-		static VertexDescr descr = { 2, sizeof(Vertex2UV), {2,2} };
+		static VertexDescr descr = { 2, sizeof(Vertex2UV), {{a_Position,2},{a_Coord,4}} };
 		return &descr;
 	}
 };
 
-
+/**
+ * @note Describes a 4D vertex with 4 components
+ * @note Attributes a_Vertex
+ */
+struct Vertex4
+{
+	float x, y, z, w; // attribute vertex.xyzw
+	static const VertexDescr* GetVertexDescr() {
+		static VertexDescr descr = { 1, sizeof(Vertex4), {{a_Vertex,4}} };
+		return &descr;
+	}
+};
 
 
 

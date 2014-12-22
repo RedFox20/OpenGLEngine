@@ -40,13 +40,13 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>freetype254\include;$(IncludePath)</IncludePath>
+    <IncludePath>freetype254\include;$(ProjectDir);$(IncludePath)</IncludePath>
     <LibraryPath>GL\;freetype254\objs\vc2010\Win32;$(LibraryPath)</LibraryPath>
     <OutDir>$(SolutionDir)bin\</OutDir>
     <TargetName>$(ProjectName)_d</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <IncludePath>freetype254\include;$(IncludePath)</IncludePath>
+    <IncludePath>freetype254\include;$(ProjectDir);$(IncludePath)</IncludePath>
     <LibraryPath>GL\;freetype254\objs\vc2010\Win32;$(LibraryPath)</LibraryPath>
     <OutDir>$(SolutionDir)bin\</OutDir>
   </PropertyGroup>
@@ -82,51 +82,65 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="DistanceField.cpp" />
     <ClCompile Include="dynamic_pool.cpp" />
-    <ClCompile Include="edtaa3.cpp" />
-    <ClCompile Include="FontBufferImage.cpp" />
-    <ClCompile Include="FontFace.cpp" />
-    <ClCompile Include="FontGlyphAtlas.cpp" />
     <ClCompile Include="FrameBuffer.cpp" />
-    <ClCompile Include="FreeType.cpp" />
     <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="GLDraw.cpp" />
-    <ClCompile Include="GuiObject.cpp" />
+    <ClCompile Include="gui\freetype\DistanceField.cpp" />
+    <ClCompile Include="gui\freetype\edtaa3.cpp" />
+    <ClCompile Include="gui\freetype\FontBufferImage.cpp" />
+    <ClCompile Include="gui\freetype\FontFace.cpp" />
+    <ClCompile Include="gui\freetype\FontGlyphAtlas.cpp" />
+    <ClCompile Include="gui\freetype\FreeType.cpp" />
+    <ClCompile Include="gui\GuiObject.cpp" />
     <ClCompile Include="Image.cpp" />
     <ClCompile Include="Input.cpp" />
+    <ClCompile Include="memory\smart_ptr.cpp" />
     <ClCompile Include="PathfinderAstar.cpp" />
     <ClCompile Include="PathfinderTest.cpp" />
     <ClCompile Include="Texture.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="utils\console.cpp" />
+    <ClCompile Include="utils\file_io.cpp" />
+    <ClCompile Include="utils\fnv.cpp" />
+    <ClCompile Include="utils\token.cpp" />
+    <ClCompile Include="utils\utf8.cpp" />
     <ClCompile Include="Vector234.cpp" />
     <ClCompile Include="VertexBuffer.cpp" />
-    <ClCompile Include="IShaderProgram.cpp" />
-    <ClCompile Include="smart_ptr.cpp" />
+    <ClCompile Include="ShaderProgram.cpp" />
     <ClCompile Include="Timer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Basetypes.h" />
-    <ClInclude Include="DistanceField.h" />
     <ClInclude Include="dynamic_pool.h" />
-    <ClInclude Include="edtaa3.h" />
+    <ClInclude Include="gui\freetype.h" />
+    <ClInclude Include="gui\freetype\DistanceField.h" />
+    <ClInclude Include="gui\freetype\edtaa3.h" />
+    <ClInclude Include="gui\freetype\FontFace.h" />
+    <ClInclude Include="gui\freetype\FreeType.h" />
+    <ClInclude Include="gui\GuiObject.h" />
     <ClInclude Include="MathEx.h" />
+    <ClInclude Include="memory\smart_ptr.h" />
     <ClInclude Include="PfList.h" />
     <ClInclude Include="FrameBuffer.h" />
-    <ClInclude Include="FreeType.h" />
     <ClInclude Include="GameObject.h" />
     <ClInclude Include="GLDraw.h" />
-    <ClInclude Include="GuiObject.h" />
     <ClInclude Include="Image.h" />
     <ClInclude Include="Input.h" />
     <ClInclude Include="PathfinderAstar.h" />
     <ClInclude Include="PathfinderTest.h" />
     <ClInclude Include="PfVector.h" />
     <ClInclude Include="Texture.h" />
+    <ClInclude Include="utils\binary_reader.h" />
+    <ClInclude Include="utils\binary_writer.h" />
+    <ClInclude Include="utils\console.h" />
+    <ClInclude Include="utils\file_io.h" />
+    <ClInclude Include="utils\fnv.h" />
+    <ClInclude Include="utils\token.h" />
+    <ClInclude Include="utils\utf8.h" />
     <ClInclude Include="Vector234.h" />
     <ClInclude Include="VertexBuffer.h" />
-    <ClInclude Include="IShaderProgram.h" />
-    <ClInclude Include="smart_ptr.h" />
+    <ClInclude Include="ShaderProgram.h" />
     <ClInclude Include="Timer.h" />
   </ItemGroup>
   <ItemGroup>

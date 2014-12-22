@@ -210,7 +210,6 @@ double distaa3_2(double a, double* gximg, double* gyimg, int closest, int xi, in
 void edtaa3(double *img, double *gx, double *gy, int w, int h, short *distx, short *disty, double *dist)
 {
 	int x, y, i, c;
-	int closest;
 	int offset_u, offset_ur, offset_r, offset_rd,
 		offset_d, offset_dl, offset_l, offset_lu;
 	double olddist, newdist;

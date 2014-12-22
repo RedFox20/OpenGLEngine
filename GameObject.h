@@ -6,7 +6,7 @@
 #ifndef GAME_OBJECT_H
 #define GAME_OBJECT_H
 
-#include "IShaderProgram.h"
+#include "ShaderProgram.h"
 
 class GameObject
 {

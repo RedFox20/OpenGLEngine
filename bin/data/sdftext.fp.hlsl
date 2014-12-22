@@ -1,3 +1,4 @@
+#define WHATEVER 1
 #version 140 // OpenGL 3.1 
 //varying vec2 vCoord;			// vertex texture coordinates 
 //uniform sampler2D diffuseTex;	// alpha mapped texture 
@@ -41,8 +42,7 @@
 //const vec3 glowColor = vec3(0.1f, 0.1f, 0.1f);
 //void main(void)
 //{
-//	vec2 tex = texture2D(diffuseTex, vCoord).rg;
-//	float dist  = tex.r;
+//	float dist  = texture2D( diffuseTex, vCoord).r;
 //	float width = fwidth(dist);
 //	float alpha = smoothstep(glyph_center-width, glyph_center+width, dist);
 //
@@ -68,6 +68,7 @@
 //    //gl_FragColor = vec4(rgb, max(color.a,beta));
 //}
 
+//// @note BEST looking function so far:
 //varying vec2 vCoord;			// vertex texture coordinates 
 //uniform sampler2D diffuseTex;	// alpha mapped texture 
 //uniform vec4 diffuseColor;		// actual color for this text 
@@ -83,26 +84,62 @@
 //	gl_FragColor = vec4(diffuseColor.rgb, smoothstep(0.5f-delta,0.5f+delta,rawAlpha));
 //}
 
-
-
-varying vec2 vCoord;			// vertex texture coordinates 
+varying vec2 vCoord;			// vertex texture coordinates
+varying vec2 vPixel;            // size of a single pixel in fraction 1.0/textureSize
 uniform sampler2D diffuseTex;	// alpha mapped texture 
 uniform vec4 diffuseColor;		// actual color for this text 
-uniform vec4 outlineColor;		// outline (or shadow) color for the text 
+uniform vec4 outlineColor;		// outline (or shadow) color for the text
+const float diffuse_end    = 0.51f;  // distance where diffuse color ends (smaller is farther)
+const float diffuse_smooth = 0.05f;  // smoothing for diffuse edges
+const float outline_radii  = 0.15f;
+const float outline_smooth = 0.05f;
+const float outline_end    = diffuse_end - outline_radii;
 
-const float smoothing = 1.0/16.0;
-const vec2 shadowOffset = vec2(-1.0/128.0);
-//const vec4 glowColor = vec4(vec3(0.1), 1.0);
-const float glowMin = 0.2;
-const float glowMax = 0.8;
-// drop shadow computed in fragment shader
+
 void main(void)
 {
-	float dst = texture2D(diffuseTex, vCoord).r;
-	float alpha = smoothstep(0.5 - smoothing, 0.5 + smoothing, dst);
-	float glowDst = texture2D(diffuseTex, vCoord + shadowOffset).r;
-	vec4 glow = outlineColor * smoothstep(glowMin, glowMax, glowDst);
-	float mask = 1.0-alpha;
-	vec4 base = diffuseColor * vec4(vec3(1.0), alpha);
-	gl_FragColor = mix(base, glow, mask);
+	//// get the alpha value from the distance field texture
+	//float distance = texture2D( diffuseTex, vCoord).r;
+
+	//if ((distance - 0.45f) < 0.0f) discard;
+
+	//gl_FragColor = vec4(diffuseColor.rgb, smoothstep(0.45f,0.55f,distance));
+
+	// get the distance value from the distance field texture
+	// 1.0 - actually 0 distance from glyph edge
+	// 0.0 - very far from glyph edge
+	float distance = texture2D(diffuseTex, vCoord).r; 
+
+	float diff_alpha = smoothstep(diffuse_end - diffuse_smooth, diffuse_end + diffuse_smooth, distance);
+	vec4 diffuse = vec4(diffuseColor.rgb, diffuseColor.a * diff_alpha);
+
+	float outl_alpha = smoothstep(outline_end - outline_smooth, outline_end + outline_smooth, distance);
+	vec4 outline = vec4(outlineColor.rgb, outlineColor.a * outl_alpha);
+
+	gl_FragColor = (diffuse * diff_alpha) + (outline * outl_alpha);
+	//gl_FragColor = mix(diffuse, outline, outl_alpha);
+	//gl_FragColor = vec4(outline.rgb, outl_alpha);
+
 }
+
+//varying vec2 vCoord;			// vertex texture coordinates 
+//uniform sampler2D diffuseTex;	// alpha mapped texture 
+//uniform vec4 diffuseColor;		// actual color for this text 
+//uniform vec4 outlineColor;		// outline (or shadow) color for the text 
+//
+//const float smoothing = 1.0/16.0;
+//const vec2 shadowOffset = vec2(-1.0/128.0);
+////const vec4 glowColor = vec4(vec3(0.1), 1.0);
+//const float glowMin = 0.2;
+//const float glowMax = 0.8;
+//// drop shadow computed in fragment shader
+//void main(void)
+//{
+//	float dst = texture2D(diffuseTex, vCoord).r;
+//	float alpha = smoothstep(0.5 - smoothing, 0.5 + smoothing, dst);
+//	float glowDst = texture2D(diffuseTex, vCoord + shadowOffset).r;
+//	vec4 glow = outlineColor * smoothstep(glowMin, glowMax, glowDst);
+//	float mask = 1.0-alpha;
+//	vec4 base = vec4(diffuseColor.rgb, diffuseColor.a * alpha);
+//	gl_FragColor = mix(base, glow, mask);
+//}

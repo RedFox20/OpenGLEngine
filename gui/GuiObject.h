@@ -7,7 +7,7 @@
 
 #include "VertexBuffer.h"
 #include "Texture.h"
-#include "FreeType.h"
+#include <gui/freetype.h>
 #include "GLDraw.h"
 
 enum GuiObjectType {

@@ -5,8 +5,8 @@
 
 #include "Input.h"
 #include "Timer.h"
-#include "GuiObject.h"
-#include "FreeType.h"
+#include <gui/GuiObject.h>
+#include <gui/freetype.h>
 
 #include <vector>
 using std::vector;
@@ -255,7 +255,7 @@ void PathfinderTest::Destroy()
 }
 
 
-void PathfinderTest::DrawScene(TextShader2D* ts, ColorShader2D* gui, const Matrix4& projection)
+void PathfinderTest::DrawScene(ShaderProgram* ts, ShaderProgram* gui, const Matrix4& projection)
 {
 	float X = WorldPos.x = ((gScreen.w - WorldSize.x - Finder.CellHalfSize) / 2);
 	float Y = WorldPos.y = ((gScreen.h - WorldSize.y - Finder.CellHalfSize) / 2);
@@ -311,15 +311,15 @@ void PathfinderTest::DrawScene(TextShader2D* ts, ColorShader2D* gui, const Matri
 		GridOverlay.Draw(projection);
 		PathfinderDebugOverlay.SetPosition(WorldPos);
 		PathfinderDebugOverlay.Draw(projection);
-		if(Finder.Start) {
+		if (Finder.Start) {
 			StartMarker.SetPosition(WorldPos + Finder.ToScreenCoord(Finder.Start));
 			StartMarker.Draw(projection);
 		}
-		if(Finder.End) {
+		if (Finder.End) {
 			EndMarker.SetPosition(WorldPos + Finder.ToScreenCoord(Finder.End));
 			EndMarker.Draw(projection);
 		}
-		if(selection) {
+		if (selection) {
 			GLDraw selMarker;
 			selMarker.RectAA(selection->xy, selection->zw, Vector4(1.0f, 0.2f, 0.2f, 0.66f), 2.0f);
 			GuiOverlay selOvl; selOvl.Create(selMarker);

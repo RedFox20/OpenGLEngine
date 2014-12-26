@@ -16,8 +16,10 @@
 #include "Input.h"
 #include <gui/freetype.h>
 using namespace freetype;
-#include "PathfinderTest.h"
+#include <pathfinder/PathfinderTest.h>
 
+
+static const bool PathfinderTest = true;
 
 /////////////////////  game objects
 
@@ -115,8 +117,10 @@ bool startup()
 		return false;
 	}
 
-	//glClearColor(0.15f, 0.15f, 0.15f, 1.0f); // clear background to soft black
-	glClearColor(1.0f, 1.0f, 1.0f, 1.0f); // pure white background
+	if (PathfinderTest)
+		glClearColor(0.15f, 0.15f, 0.15f, 1.0f); // clear background to soft black
+	else
+		glClearColor(1.0f, 1.0f, 1.0f, 1.0f); // pure white background
 	glEnable(GL_BLEND); // enable alpha mapping
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
@@ -191,11 +195,13 @@ bool startup()
 	GuiTexts[6]->SetColor(White, Shadow);
 	GuiTexts[7]->SetColor(Pink, Shadow);
 
-	//PathfinderTest::Create();
+	if (PathfinderTest) PathfinderTest::Create();
 	return true;
 }
 void shutdown()
 {
+	if (PathfinderTest) PathfinderTest::Destroy();
+
 	glutDestroyWindow(1);
 	for (GameObject* obj : GameObjects)	   delete obj;
 	for (ShaderProgram* shader : Shaders)  delete shader;
@@ -211,7 +217,6 @@ void shutdown()
 	Texts.clear();
 	GuiTexts.clear();
 
-	//PathfinderTest::Destroy();
 	exit(0); // exit the process
 }
 
@@ -338,7 +343,7 @@ void frame_start()
 		glm::perspective(45.0f, gScreen.w / gScreen.h, 0.1f, 10000.0f) *
 		glm::lookAt<float>(Vector3(0, 0, 3), Vector3(0, 0, 0), Vector3(0, 1, 0));
 
-	if (true)
+	if (!PathfinderTest)
 	{
 		Shaders[SID_SimpleShader]->Bind();
 		for(const GameObject* obj : GameObjects)
@@ -351,11 +356,12 @@ void frame_start()
 	
 	ViewProjection = glm::ortho(0.0f, gScreen.w, 0.0f, gScreen.h, -1.0f, 1.0f);
 	{
-		//PathfinderTest::DrawScene(
-		//	(TextShader2D*)Shaders[SID_TextShader2D], 
-		//	(ColorShader2D*)Shaders[SID_ColorShader2D], ViewProjection);
 
-		if (true)
+		if (PathfinderTest)
+		{
+			PathfinderTest::DrawScene(Shaders[SID_TextShader2D], Shaders[SID_ColorShader2D], ViewProjection);
+		}
+		else
 		{
 			for (GuiText* text : GuiTexts)
 			{

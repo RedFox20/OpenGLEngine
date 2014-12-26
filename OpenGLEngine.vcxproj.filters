@@ -24,6 +24,9 @@
     <Filter Include="Source Files\gui\freetype">
       <UniqueIdentifier>{2230fb6c-868b-42b1-a073-f5da05f7bfa4}</UniqueIdentifier>
     </Filter>
+    <Filter Include="pathfinder">
+      <UniqueIdentifier>{64036904-448a-4aae-b0f6-555ca9f7c706}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="GameObject.cpp">
@@ -54,12 +57,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Vector234.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="PathfinderTest.cpp">
-      <Filter>Frontend Files</Filter>
-    </ClCompile>
-    <ClCompile Include="PathfinderAstar.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="dynamic_pool.cpp">
@@ -107,6 +104,15 @@
     <ClCompile Include="ShaderProgram.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="pathfinder\PathfinderTest.cpp">
+      <Filter>pathfinder</Filter>
+    </ClCompile>
+    <ClCompile Include="pathfinder\PathfinderAstar.cpp">
+      <Filter>pathfinder</Filter>
+    </ClCompile>
+    <ClCompile Include="pathfinder\AstarGrid.cpp">
+      <Filter>pathfinder</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Texture.h">
@@ -130,9 +136,6 @@
     <ClInclude Include="GameObject.h">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="PathfinderTest.h">
-      <Filter>Frontend Files</Filter>
-    </ClInclude>
     <ClInclude Include="Image.h">
       <Filter>Source Files</Filter>
     </ClInclude>
@@ -142,16 +145,7 @@
     <ClInclude Include="Vector234.h">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="PathfinderAstar.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="PfList.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
     <ClInclude Include="dynamic_pool.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="PfVector.h">
       <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="MathEx.h">
@@ -201,6 +195,21 @@
     </ClInclude>
     <ClInclude Include="ShaderProgram.h">
       <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="pathfinder\PathfinderAstar.h">
+      <Filter>pathfinder</Filter>
+    </ClInclude>
+    <ClInclude Include="pathfinder\PathfinderTest.h">
+      <Filter>pathfinder</Filter>
+    </ClInclude>
+    <ClInclude Include="pathfinder\AstarNode.h">
+      <Filter>pathfinder</Filter>
+    </ClInclude>
+    <ClInclude Include="pathfinder\AstarGrid.h">
+      <Filter>pathfinder</Filter>
+    </ClInclude>
+    <ClInclude Include="pathfinder\AstarContainers.h">
+      <Filter>pathfinder</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

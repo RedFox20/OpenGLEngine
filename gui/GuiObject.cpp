@@ -34,15 +34,15 @@
 	}
 
 	// sets the position of the object, regardless of any rotation
-	void GuiObject::SetPosition(const Vector2& pos)
+	void GuiObject::SetPosition(const Vector2& newPos)
 	{
-		this->pos = pos;
+		pos.x = roundf(newPos.x), pos.y = roundf(newPos.y);
 	}
 
 	// sets the position of the object, regardless of any rotation
 	void GuiObject::SetPosition(float x, float y)
 	{
-		pos.x = x, pos.y = y;
+		pos.x = roundf(x), pos.y = roundf(y);
 	}
 
 	// sets the 2D scale of the object

@@ -73,6 +73,9 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <DisableSpecificWarnings>4996;%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <OmitFramePointers>true</OmitFramePointers>
+      <EnableEnhancedInstructionSet>AdvancedVectorExtensions</EnableEnhancedInstructionSet>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -96,8 +99,9 @@
     <ClCompile Include="Image.cpp" />
     <ClCompile Include="Input.cpp" />
     <ClCompile Include="memory\smart_ptr.cpp" />
-    <ClCompile Include="PathfinderAstar.cpp" />
-    <ClCompile Include="PathfinderTest.cpp" />
+    <ClCompile Include="pathfinder\AstarGrid.cpp" />
+    <ClCompile Include="pathfinder\PathfinderAstar.cpp" />
+    <ClCompile Include="pathfinder\PathfinderTest.cpp" />
     <ClCompile Include="Texture.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="utils\console.cpp" />
@@ -121,15 +125,16 @@
     <ClInclude Include="gui\GuiObject.h" />
     <ClInclude Include="MathEx.h" />
     <ClInclude Include="memory\smart_ptr.h" />
-    <ClInclude Include="PfList.h" />
     <ClInclude Include="FrameBuffer.h" />
     <ClInclude Include="GameObject.h" />
     <ClInclude Include="GLDraw.h" />
     <ClInclude Include="Image.h" />
     <ClInclude Include="Input.h" />
-    <ClInclude Include="PathfinderAstar.h" />
-    <ClInclude Include="PathfinderTest.h" />
-    <ClInclude Include="PfVector.h" />
+    <ClInclude Include="pathfinder\AstarContainers.h" />
+    <ClInclude Include="pathfinder\AstarGrid.h" />
+    <ClInclude Include="pathfinder\AstarNode.h" />
+    <ClInclude Include="pathfinder\PathfinderAstar.h" />
+    <ClInclude Include="pathfinder\PathfinderTest.h" />
     <ClInclude Include="Texture.h" />
     <ClInclude Include="utils\binary_reader.h" />
     <ClInclude Include="utils\binary_writer.h" />

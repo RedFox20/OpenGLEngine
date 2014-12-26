@@ -56,29 +56,18 @@ Vector4* selection = NULL;
 static void OnMouseMove(int relX, int relY, int relZ)
 {
 	static Vector4 sel;
-	if(relX || relY)
+	if (relX || relY)
 	{
 		Vector2 pos(mouseX() - WorldPos.x, gScreen.h - mouseY() - WorldPos.y);
 		Vector2i vpos = Finder.ToVirtualCoord(pos);
 
-#if USE_QTREE
-		if(AstarQNode* qnode = Finder.grid.Qtree->Get(vpos.x, vpos.y))
+		if (AstarNode* node = Finder.Grid.get(vpos.x, vpos.y))
 		{
-			sel.set((float)qnode->x, (float)qnode->y, (float)qnode->size, (float)qnode->size);
+			sel.set((float)node->X, (float)node->Y, 1.0f, 1.0f);
 			sel *= Finder.CellSize;
 			selection = &sel;
 		}
 		else selection = NULL;
-#else
-		if(AstarNode* node = Finder.grid.Get(vpos.x, vpos.y))
-		{
-			sel.set(node->X, node->Y, 1.0f, 1.0f);
-			sel *= Finder.CellSize;
-			selection = &sel;
-		}
-		else selection = NULL;
-
-#endif
 	}
 }
 
@@ -87,35 +76,30 @@ static void OnMouseMove(int relX, int relY, int relZ)
 
 void PathfinderStressTest()
 {
-	int width = Finder.grid.Width;
-	int height = Finder.grid.Height;
+	int width  = Finder.Grid.Width;
+	int height = Finder.Grid.Height;
 
-#if USE_PFLIST
-	const wchar_t* container = L"PfList";
+	const char* container = typeid(PfOpenList).name() + 7; // skip "struct "
 	PfVector<Vector2> path;
-#elif USE_PFVECTOR
-	const wchar_t* container = L"PfVector";
-	PfVector<Vector2> path;
-#else
-	const wchar_t* container = L"std::vector";
-	vector<Vector2> path;
-#endif
 
 	Finder.SetStart(0, 0);
 	int opens = 0;
 	int reopens = 0;
 	double pfElapsed = Timer::Measure([&]() {
-		for(int x = 0; x < width; ++x)
+		for (int i = 0; i < 25; ++i)
 		{
-			for(int y = 0; y < height; ++y)
+			for(int x = 0; x < width; ++x)
 			{
-				Finder.SetEnd(x, y);
-				if(Finder.Start && Finder.End)
+				for(int y = 0; y < height; ++y)
 				{
-					Finder.Process(path, NULL);
-					path.clear();
-					opens += Finder.NumOpened;
-					reopens += Finder.NumReopened;
+					Finder.SetEnd(x, y);
+					if (Finder.Start && Finder.End)
+					{
+						Finder.Process(path, NULL);
+						path.clear();
+						opens += Finder.NumOpened;
+						reopens += Finder.NumReopened;
+					}
 				}
 			}
 		}
@@ -124,12 +108,13 @@ void PathfinderStressTest()
 	int tilesPerSecond = int((1.0 / pfElapsed) * opens);
 	PathfinderSTText.CreateF(MonoFont,
 		L"A* stress-test:\n"
-		L"  <%s>\n"
-		L"  millis  %dms\n"
-		L"  tiles/s %d\n"
-		L"  opens   %d\n"
-		L"  reopens %d\n",
-		container, int(pfElapsed*1000), tilesPerSecond, opens, reopens);
+		L"  <%hs>\n"
+		L"  millis   %dms\n"
+		L"  tiles/s  %d\n"
+		L"  opens    %d\n"
+		L"  reopens  %d\n"
+		L"  maxdepth %d\n",
+		container, int(pfElapsed*1000), tilesPerSecond, opens, reopens, Finder.MaxDepth);
 }
 
 
@@ -165,38 +150,11 @@ void PathfinderTest::Create()
 	planeColors.emplace_back(0.15f, 0.55f, 0.55f, 0.33f);	// plane 5 is BLUE GREEN
 	srand(12344); // so the colors always look the same
 	auto randcolor = []() { return (32 + rand() % 128) / 255.0f; };
-	for(uint i = 6; i < Finder.grid.NumPlanes; ++i)
+	for(uint i = 6; i < Finder.Grid.NumPlanes; ++i)
 		planeColors.emplace_back(randcolor(), randcolor(), randcolor(), 0.8f);
 
 	GLDraw gridOverlay;
 
-#if USE_QTREE
-	Vector4 coolblue(0.0f, 0.45f, 0.77f, 0.66f);
-
-	Vector4 pink(0.79f, 0.25, 0.41f, 0.2f);
-	Vector2 size(CELLSIZE, CELLSIZE);
-	double tOverlay = Timer::Measure([&](){
-		int count = world.width * world.height;
-		for(int i = 0; i < count; ++i)
-		{
-			AstarNode& node = Finder.grid.Nodes[i];
-			Vector2 pos(node.X * CELLSIZE, node.Y * CELLSIZE);
-			gridOverlay.FillRect(pos, size, planeColors[node.Plane]);
-			if(node.Plane != 1)
-					gridOverlay.RectAA(pos, size, planeColors[node.Plane], 1.0f);
-		}
-		vector<AstarQNode*> qnodes;
-		Finder.grid.Qtree->GetAllQNodes(qnodes);
-		for(AstarQNode* q : qnodes)
-		{
-			Vector2 pos(q->x * CELLSIZE, q->y * CELLSIZE);
-			Vector2 size(q->size * CELLSIZE, q->size * CELLSIZE);
-			gridOverlay.RectAA(pos, size, coolblue, 2.0f);
-		}
-		size_t numQTreeNodes = qnodes.size();
-		GridOverlay.Create(gridOverlay);
-	});
-#else
 	Vector2 origin(Vector2::ZERO); 
 	Vector2 size(CELLSIZE, CELLSIZE);
 	double tOverlay = Timer::Measure([&](){
@@ -204,7 +162,7 @@ void PathfinderTest::Create()
 		{
 			for(int y = 0; y < world.height; y++)
 			{
-				AstarNode& node = Finder.grid.Nodes[x * world.width + y];
+				AstarNode& node = Finder.Grid.Nodes[x * world.width + y];
 				gridOverlay.FillRect(origin, size, planeColors[node.Plane]);
 				if(node.Plane != 1) // no grid for obstructed areas
 					gridOverlay.RectAA(origin, size, Vector4(planeColors[node.Plane].rgb * 2.0f, 0.5f)); // brighter transparent
@@ -215,10 +173,9 @@ void PathfinderTest::Create()
 		}
 		GridOverlay.Create(gridOverlay);
 	});
-#endif
 
 
-	printf("Num Planes: %d\n", Finder.grid.NumPlanes);
+	printf("Num Planes: %d\n", Finder.Grid.NumPlanes);
 	printf("Overlay init: %fs\n", tOverlay);
 
 	// initialize start / end markers
@@ -262,19 +219,12 @@ void PathfinderTest::DrawScene(ShaderProgram* ts, ShaderProgram* gui, const Matr
 
 	if(PathChanged && Finder.Start && Finder.End)
 	{
-#if USE_PFLIST
 		PfVector<Vector2> path;
 		PfVector<Vector2> explored;
-#elif USE_PFVECTOR
-		PfVector<Vector2> path;
-		PfVector<Vector2> explored;
-#else
-		vector<Vector2> path;
-		vector<Vector2> explored;
-#endif
+
 		Timer time(tstart);
 		double pfElapsed = Timer::Measure([&]() {
-			if(true) // debug
+			if (true) // debug
 				Finder.Process(path, &explored);
 			else
 				Finder.Process(path, NULL);
@@ -285,13 +235,20 @@ void PathfinderTest::DrawScene(ShaderProgram* ts, ShaderProgram* gui, const Matr
 		GLDraw debugOverlay;
 		int numLinks = 0;
 
-		if(!explored.empty())
-			for(auto it = explored.begin(); it != explored.end();) // green 'explored' lines
-				debugOverlay.LineAA(*it++, *it++, GreenExplored, 1.0f);
+		if (!explored.empty())
+		{
+			for (auto it = explored.begin(); it != explored.end(); it += 2) // green 'explored' lines
+				debugOverlay.LineAA(it[0], it[1], GreenExplored, 1.0f);
+		}
 
-		if(!path.empty())
-			for(auto a = path.begin(), b = ++path.begin(); b != path.end(); ++numLinks) // red 'path' lines
+		if (!path.empty())
+		{
+			auto a = path.begin();
+			auto b = path.begin() + 1;
+			for(; b != path.end(); ++numLinks) // red 'path' lines
 				debugOverlay.LineAA(*a++, *b++, RedPath, 3.0f);
+		}
+
 		PathfinderDebugOverlay.Create(debugOverlay);
 		//debugOverlay.Clear();
 

@@ -100,7 +100,7 @@
 
 		/**
 		 * Opens an existing file for reading with mode = READONLY
-		 * Creates a new file for reading/writing with mode = READWRITE
+		 * Create a new file for reading/writing with mode = READWRITE
 		 * @param filename File name to open or create
 		 * @param mode File open mode
 		 */
@@ -485,7 +485,7 @@
 
 
 	/**
-	 * @brief Dirwatch and Dirmonitor filtering flags
+	 * @brief Dirwatch filtering flags
 	 */
 	enum dirwatch_flags
 	{

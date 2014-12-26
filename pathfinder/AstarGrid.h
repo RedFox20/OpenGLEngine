@@ -1,8 +1,8 @@
 #pragma once
 #include "AstarContainers.h"
 
-typedef node_heap PfOpenList;
-//typedef node_vect PfOpenList;
+//typedef node_heap PfOpenList;
+typedef node_vect PfOpenList;
 
 struct AstarGrid
 {

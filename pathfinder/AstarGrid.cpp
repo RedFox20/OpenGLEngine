@@ -63,7 +63,7 @@ void AstarGrid::quick_fill(PfVector<AstarNode*>& open, AstarNode* firstNode, int
 				AstarLink* links = node->Links;
 				for (int i = 0; i < count; ++i)
 					if (links[i].node == link) { // link already exists?
-						addlink = true;
+						addlink = false;
 						break;
 					}
 			}

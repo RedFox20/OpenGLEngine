@@ -103,7 +103,35 @@ struct node_heap
 				cap += 8 - rem;
 			Data = (T*)realloc(Data, sizeof(T)*(Capacity = cap));
 		}
-		insert_up(Data, Size++, item);
+		insert_up(Data, Size++, item); // insert to back
+
+
+		//// swap first and last
+		//T* ptr = Data;
+		//const int size = ++Size;
+		//const int last = size - 1;
+		//int current    = 0;
+		//int child      = (current << 1) + 1; // left_child = i*2 + 1
+		//const int itemScore = item->FScore;
+
+		//while (child < size) // move downwards in the heap
+		//{
+		//	T dataChild = ptr[child];
+		//	if (child < last) // test if rightChild is a better option
+		//	{
+		//		T rightChild = ptr[child+1];
+		//		if (dataChild->FScore > rightChild->FScore)
+		//			dataChild = rightChild, ++child;
+		//	}
+		//	if (itemScore > dataChild->FScore)
+		//	{
+		//		ptr[current] = dataChild; // promote child to new parent
+		//		current = child; // move downwards
+		//		child   = (current << 1) + 1; // left_child = i*2 + 1
+		//	}
+		//	else break;
+		//}
+		//ptr[current] = item; // write the final value
 	}
 
 	T pop()

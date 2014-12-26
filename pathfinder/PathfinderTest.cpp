@@ -86,7 +86,12 @@ void PathfinderStressTest()
 	int opens = 0;
 	int reopens = 0;
 	double pfElapsed = Timer::Measure([&]() {
-		for (int i = 0; i < 25; ++i)
+		#if _DEBUG
+		const int iterations = 5;
+		#else
+		const int iterations = 50;
+		#endif
+		for (int i = 0; i < iterations; ++i)
 		{
 			for(int x = 0; x < width; ++x)
 			{

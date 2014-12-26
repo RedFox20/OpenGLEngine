@@ -14,11 +14,11 @@
 	}
 
 
-	__forceinline static int abs_dist(int dist)
-	{
-		return dist >= 0 ? dist : -dist;
-	}
-
+	/**
+	 * @warning This function is heavily optimized using profile guided optimization hints
+	 *          and cache stall info. If you plan to optimize/change this function, please 
+	 *          use a profiler to measure changes
+	 */
 	bool PathfinderAstar::Process(PfVector<Vector2>& outPath, PfVector<Vector2>* explored)
 	{
 		NumOpened   = 0;
@@ -40,12 +40,11 @@
 			AstarLink* link  = head->Links;
 			AstarLink* elink = link + head->NumLinks;
 			int headGScore   = head->GScore;
-			byte planeID     = head->Plane;
 
 			for (; link != elink; ++link)
 			{
 				AstarNode* n = link->node;
-				if (n == prev || planeID != n->Plane)
+				if (n == prev || n->Plane == 1)
 					continue; // avoid circural references
 
 				if (openID == n->OpenID) // we have opened this Node before
@@ -68,9 +67,18 @@
 				}
 				else
 				{
-					n->HScore = (abs_dist(goalX - n->X) + abs_dist(goalY - n->Y)) * 8; // (distX + distY)*8
-					n->GScore = headGScore + link->gain;
-					n->FScore = n->HScore + n->GScore;
+					// calculate HScore
+					// (abs(distX) + abs(distY))*8
+					int HScore = goalX - n->X, diffY = goalY - n->Y;
+					if (HScore < 0) HScore = -HScore;
+					if (diffY  < 0) diffY = -diffY;
+					HScore += diffY;
+					HScore <<= 3;
+
+					int GScore = headGScore + link->gain;
+					n->HScore = HScore;
+					n->GScore = GScore;
+					n->FScore = HScore + GScore;
 					n->Closed = false;
 					n->Prev   = head;
 					n->OpenID = openID;
@@ -80,10 +88,13 @@
 					OpenList.insert(n);
 				}
 
-				int size = OpenList.size();
-				if (size > MaxDepth) MaxDepth = size;
-				if (explored) explored->push_back(ToScreenCoordCentered(head)),
-								explored->push_back(ToScreenCoordCentered(n));
+				if (explored)
+				{
+					int size = OpenList.size();
+					if (size > MaxDepth) MaxDepth = size;
+					explored->push_back(ToScreenCoordCentered(head));
+					explored->push_back(ToScreenCoordCentered(n));
+				}
 			}
 
 			// after inserting into the sorted list we get the heuristically best node available
@@ -97,8 +108,9 @@
 		// construct the out path
 		head = end;
 		do {
-			outPath.push_back(ToScreenCoordCentered(head));
-		} while(head = head->Prev);
+			Vector2 coord = ToScreenCoordCentered(head);
+			outPath.push_back(coord);
+		} while (head = head->Prev);
 
 		OpenList.clear(); // resets the pool
 		return true;

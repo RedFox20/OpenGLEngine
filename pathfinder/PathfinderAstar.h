@@ -17,8 +17,6 @@ using std::deque;
 
 extern Vector2 gScreen; // global screen size
 
-#define USE_JPS 0
-
 struct PathfinderAstar
 {
 	AstarGrid  Grid;
@@ -52,7 +50,7 @@ struct PathfinderAstar
 	// only works correctly for positions that match InWorld()
 	Vector2i ToVirtualCoord(const Vector2& pos) const;
 	Vector2i ToVirtualCoord(float x, float y) const;
-	bool InWorld(const Vector2& pos) const;
+	bool InWorld(float x, float y) const;
 
 
 	bool SetEnd(int x, int y);

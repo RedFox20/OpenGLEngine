@@ -9,11 +9,11 @@
 	// destroys the frame and depth buffer
 	void FrameBuffer::Destroy()
 	{
-		if(glDepthBuffer)
+		if (glDepthBuffer)
 			glDeleteRenderbuffers(1, &glDepthBuffer), glDepthBuffer = 0;
-		if(glFrameBufferTexture)
+		if (glFrameBufferTexture)
 			glDeleteTextures(1, &glFrameBufferTexture), glFrameBufferTexture = 0;
-		if(glFrameBuffer)
+		if (glFrameBuffer)
 			glDeleteFramebuffers(1, &glFrameBuffer), glFrameBuffer = 0;
 	}
 

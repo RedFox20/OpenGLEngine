@@ -22,8 +22,8 @@ using namespace std;
 	{
 		int m = glutGetModifiers();
 		keysdown[KEY_SHIFT] = m & GLUT_ACTIVE_SHIFT ? true : false;
-		keysdown[KEY_CTRL] = m & GLUT_ACTIVE_CTRL ? true : false;
-		keysdown[KEY_ALT] = m & GLUT_ACTIVE_CTRL ? true : false;
+		keysdown[KEY_CTRL]  = m & GLUT_ACTIVE_CTRL  ? true : false;
+		keysdown[KEY_ALT]   = m & GLUT_ACTIVE_CTRL  ? true : false;
 	}
 
 	void keyboard_down(unsigned char ch, int, int) 
@@ -38,7 +38,7 @@ using namespace std;
 
 	unsigned char get_special_key(int ch)
 	{
-		if(ch <= GLUT_KEY_F12)
+		if (ch <= GLUT_KEY_F12)
 			return KEY_F1 + (ch - 0x01);
 		return KEY_LEFT + (ch - 0x64);
 	}
@@ -57,11 +57,11 @@ using namespace std;
 
 	void mouse_button(int button, int state, int x, int y) 
 	{ 
-		if(button <= 2) // LMB, MMB, RMB
+		if (button <= 2) // LMB, MMB, RMB
 		{
 			Input::TriggerMouseButton(button, state == GLUT_DOWN, false);
 		}
-		else if(button <= 4) // scrlup, scrldn
+		else if (button <= 4) // scrlup, scrldn
 		{
 			// each wheel event reports like a button click, GLUT_DOWN then GLUT_UP
 			if(state == GLUT_UP) return; // disregard redundant event
@@ -91,9 +91,9 @@ using namespace std;
 	int relX() { return relx; }
 	int relY() { return rely; }
 	int relZ() { return relz; }
-	bool isKeyDown(unsigned char key) { return keysdown[key]; }
+	bool isKeyDown(unsigned char key)    { return keysdown[key];    }
 	bool isKeyChanged(unsigned char key) { return keyschanged[key]; }
-	bool isMouseDown(MouseButton button) { return buttons[button]; }
+	bool isMouseDown(MouseButton button) { return buttons[button];  }
 
 
 
@@ -113,17 +113,17 @@ using namespace std;
 	}
 
 
-	static vector<IKeyListener*> keyListeners;
+	static vector<IKeyListener*>   keyListeners;
 	static vector<IMouseListener*> mouseListeners;
-	static vector<KeyChangeFunc> keyChangeListeners;
-	static vector<MouseMoveFunc> mouseMoveListeners;
+	static vector<KeyChangeFunc>   keyChangeListeners;
+	static vector<MouseMoveFunc>   mouseMoveListeners;
 	static vector<MouseButtonFunc> mouseButtonListeners;
 
 	template<class T> inline void remove_first(const T& item, std::vector<T>& vec)
 	{
 		auto end = vec.end();
-		for(auto it = vec.begin(); it != end; ++it)
-			if(*it == item) {
+		for (auto it = vec.begin(); it != end; ++it)
+			if (*it == item) {
 				vec.erase(it);
 				break;
 			}
@@ -132,15 +132,15 @@ using namespace std;
 
 	void Input::Add(IKeyListener* listener)
 	{
-		if(listener) keyListeners.push_back(listener);
+		if (listener) keyListeners.push_back(listener);
 	}
 	void Input::Add(IMouseListener* listener)
 	{
-		if(listener) mouseListeners.push_back(listener);
+		if (listener) mouseListeners.push_back(listener);
 	}
 	void Input::Add(IKeyMouseListener* listener)
 	{
-		if(listener) keyListeners.push_back(listener), mouseListeners.push_back(listener);
+		if (listener) keyListeners.push_back(listener), mouseListeners.push_back(listener);
 	}
 	void Input::Remove(IKeyListener* listener)
 	{
@@ -158,15 +158,15 @@ using namespace std;
 
 	void Input::AddKeyChange(KeyChangeFunc key)
 	{
-		if(key) keyChangeListeners.push_back(key);
+		if (key) keyChangeListeners.push_back(key);
 	}
 	void Input::AddMouseMove(MouseMoveFunc mouse)
 	{
-		if(mouse) mouseMoveListeners.push_back(mouse);
+		if (mouse) mouseMoveListeners.push_back(mouse);
 	}
 	void Input::AddMouseButton(MouseButtonFunc mouse)
 	{
-		if(mouse) mouseButtonListeners.push_back(mouse);
+		if (mouse) mouseButtonListeners.push_back(mouse);
 	}
 	void Input::Remove(KeyChangeFunc key)
 	{
@@ -189,7 +189,7 @@ using namespace std;
 	void Input::TriggerKey(int key, wchar_t keyChar, bool down)
 	{
 		bool repeat;
-		if(keysdown[key] != down) // changed?
+		if (keysdown[key] != down) // changed?
 		{
 			keyschanged[key] = true; // set changed
 			keysdown[key] = down; // set key
@@ -200,52 +200,52 @@ using namespace std;
 			keyschanged[key] = false; // key not changed
 			repeat = true; // repeating key
 		}
-		for(auto f : keyListeners) f->OnKeyChange(key, keyChar, down, repeat);
-		for(auto f : keyChangeListeners) f(key, keyChar, down, repeat);
+		for (auto f : keyListeners) f->OnKeyChange(key, keyChar, down, repeat);
+		for (auto f : keyChangeListeners) f(key, keyChar, down, repeat);
 	}
 	
 	
 	void Input::TriggerMouseMove(int newX, int newY, int relZ)
 	{
-		if(newX == -1)
+		if (newX == -1)
 			relx = 0;
 		else
 			relx = newX - mousex, 
 			mousex = newX;
 		
-		if(newY == -1)
+		if (newY == -1)
 			rely = 0;
 		else
 			rely = newY - mousey, 
 			mousey = newY;
 		
-		if(relZ)
+		if (relZ)
 			relz = (relZ > 0 ? 1 : -1), 
 			mousez += relz;
 		
-		if(!relx && !rely && !relz) // no changes?
+		if (!relx && !rely && !relz) // no changes?
 			return; // don't trigger if no changes
 
-		for(auto f : mouseListeners) f->OnMouseMove(relx, rely, relz);
-		for(auto f : mouseMoveListeners) f(relx, rely, relz);
+		for (auto f : mouseListeners) f->OnMouseMove(relx, rely, relz);
+		for (auto f : mouseMoveListeners) f(relx, rely, relz);
 	}
 	
 	
 	void Input::TriggerMouseButton(int button, bool down, bool doubleClick)
 	{
 		buttons[button] = down;
-		for(auto f : mouseListeners) f->OnMouseButton(button, down, doubleClick);
-		for(auto f : mouseButtonListeners) f(button, down, doubleClick);
+		for (auto f : mouseListeners) f->OnMouseButton(button, down, doubleClick);
+		for (auto f : mouseButtonListeners) f(button, down, doubleClick);
 	}
 	
 	
 	void Input::TriggerFocusLost()
 	{
 		// trigger mouseup for all buttons that are down
-		for(int i = 0; i < sizeof(buttons); i++)
+		for (int i = 0; i < sizeof(buttons); i++)
 			if(buttons[i]) Input::TriggerMouseButton(i, false, false);
 		// trigger keyup for all keys that are down
-		for(int i = 0; i < sizeof(keysdown); i++)
+		for (int i = 0; i < sizeof(keysdown); i++)
 			if(keysdown[i]) Input::TriggerKey(i, (wchar_t)i, false);
 	}
 

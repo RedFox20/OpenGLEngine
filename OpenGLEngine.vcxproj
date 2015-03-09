@@ -86,9 +86,9 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="dynamic_pool.cpp" />
-    <ClCompile Include="FrameBuffer.cpp" />
     <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="GLDraw.cpp" />
+    <ClCompile Include="Graphics.cpp" />
     <ClCompile Include="gui\freetype\DistanceField.cpp" />
     <ClCompile Include="gui\freetype\edtaa3.cpp" />
     <ClCompile Include="gui\freetype\FontBufferImage.cpp" />
@@ -102,6 +102,10 @@
     <ClCompile Include="pathfinder\AstarGrid.cpp" />
     <ClCompile Include="pathfinder\PathfinderAstar.cpp" />
     <ClCompile Include="pathfinder\PathfinderTest.cpp" />
+    <ClCompile Include="shader\FrameBuffer.cpp" />
+    <ClCompile Include="shader\ShaderManager.cpp" />
+    <ClCompile Include="shader\ShaderProgram.cpp" />
+    <ClCompile Include="shader\VertexBuffer.cpp" />
     <ClCompile Include="Texture.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="utils\console.cpp" />
@@ -110,13 +114,13 @@
     <ClCompile Include="utils\token.cpp" />
     <ClCompile Include="utils\utf8.cpp" />
     <ClCompile Include="Vector234.cpp" />
-    <ClCompile Include="VertexBuffer.cpp" />
-    <ClCompile Include="ShaderProgram.cpp" />
     <ClCompile Include="Timer.cpp" />
+    <ClCompile Include="Window.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Basetypes.h" />
     <ClInclude Include="dynamic_pool.h" />
+    <ClInclude Include="Graphics.h" />
     <ClInclude Include="gui\freetype.h" />
     <ClInclude Include="gui\freetype\DistanceField.h" />
     <ClInclude Include="gui\freetype\edtaa3.h" />
@@ -125,7 +129,6 @@
     <ClInclude Include="gui\GuiObject.h" />
     <ClInclude Include="MathEx.h" />
     <ClInclude Include="memory\smart_ptr.h" />
-    <ClInclude Include="FrameBuffer.h" />
     <ClInclude Include="GameObject.h" />
     <ClInclude Include="GLDraw.h" />
     <ClInclude Include="Image.h" />
@@ -135,6 +138,10 @@
     <ClInclude Include="pathfinder\AstarNode.h" />
     <ClInclude Include="pathfinder\PathfinderAstar.h" />
     <ClInclude Include="pathfinder\PathfinderTest.h" />
+    <ClInclude Include="shader\FrameBuffer.h" />
+    <ClInclude Include="shader\ShaderManager.h" />
+    <ClInclude Include="shader\ShaderProgram.h" />
+    <ClInclude Include="shader\VertexBuffer.h" />
     <ClInclude Include="Texture.h" />
     <ClInclude Include="utils\binary_reader.h" />
     <ClInclude Include="utils\binary_writer.h" />
@@ -144,9 +151,8 @@
     <ClInclude Include="utils\token.h" />
     <ClInclude Include="utils\utf8.h" />
     <ClInclude Include="Vector234.h" />
-    <ClInclude Include="VertexBuffer.h" />
-    <ClInclude Include="ShaderProgram.h" />
     <ClInclude Include="Timer.h" />
+    <ClInclude Include="Window.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="bin\data\guicolor.fp.hlsl">

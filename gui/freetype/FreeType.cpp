@@ -27,7 +27,7 @@ namespace freetype
 	/**
 	 * Creates a Font based on the provided FontFace
 	 */
-	bool Font::Create(FontFace* face, unsigned fontHeight, FontStyle style, float outlineParam, int dpi)
+	bool Font::Create(FontFace* face, int fontHeight, FontStyle style, float outlineParam, int dpi)
 	{
 		Timer t(tstart);
 		if (atlas.IsCreated())
@@ -40,8 +40,8 @@ namespace freetype
 		FT_Activate_Size(FT_Size(ftSize));
 		FT_Set_Char_Size(ftFace, 0, fontHeight * 64, 0, dpi);
 
-		this->height = (ushort)fontHeight;
-		this->dpi = (ushort)dpi;
+		this->height = fontHeight;
+		this->dpi    = dpi;
 
 		// this is the actual heavyweight initializer:
 		atlas.Create(this, fontHeight, style, outlineParam);
@@ -190,11 +190,10 @@ namespace freetype
 	/** @return Specified glyphs XY offset */
 	Vector2 Text::GlyphXY(size_t i) const
 	{
-		Vertex4* v = (Vertex4*)((VertexBuffer*)&vb)->MapVBO(MAP_RO);
-		float x = v[i * 6].x;
-		float y = v[i * 6].y;
+		int offset = i * 6 * sizeof(Vertex4);
+		Vector2 v = *(Vector2*)((VertexBuffer*)&vb)->MapVBO(offset, sizeof(Vector2), MAP_RO);
 		((VertexBuffer*)&vb)->UnmapVBO();
-		return Vector2(x, y);
+		return v;
 	}
 
 	/**

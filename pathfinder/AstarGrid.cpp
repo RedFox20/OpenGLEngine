@@ -17,23 +17,22 @@ void AstarGrid::create(int width, int height, const byte* initData)
 	Width  = width;
 	Height = height;
 	Nodes  = new AstarNode[count];
-	for (int x = 0; x < width; ++x) 
+
+	for (int y = 0; y < height; ++y)
+	for (int x = 0; x < width;  ++x) 
 	{
-		for (int y = 0; y < height; ++y)
-		{
-			const int i = (x * width) + y;
-			AstarNode& n = Nodes[i];
-			n.FScore = 0;
-			n.GScore = 0;
-			n.HScore = 0;
-			n.Closed = false;
-			n.Plane  = initData[i] < 128 ? 1 : 0; // black tiles: plane1, other uninit
-			n.X      = x;
-			n.Y      = y;
-			n.OpenID = 0;
-			n.Prev   = 0;
-			n.NumLinks = 0;
-		}
+		const int i = (y * width) + x;
+		AstarNode& n = Nodes[i];
+		n.FScore = 0;
+		n.GScore = 0;
+		n.HScore = 0;
+		n.Closed = false;
+		n.Plane  = initData[i] < 128 ? 1 : 0; // black tiles: plane1, other uninit
+		n.X      = x;
+		n.Y      = y;
+		n.OpenID = 0;
+		n.Prev   = 0;
+		n.NumLinks = 0;
 	}
 	// initialize plane ID-s and grid links
 	NumPlanes = fill_planes(count, 2);
@@ -96,5 +95,5 @@ void AstarGrid::quick_fill(PfVector<AstarNode*>& open, AstarNode* firstNode, int
 AstarNode* AstarGrid::get(int x, int y)
 {
 	if (x < 0 || Width <= x || y < 0 || Height <= y) return NULL; // world bounds checkin'
-	return &Nodes[x * Width + y];
+	return &Nodes[y * Width + x];
 }

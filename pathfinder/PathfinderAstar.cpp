@@ -7,6 +7,7 @@
 		CellHalfSize = cellSize * 0.5f;
 		OpenID = 0;
 		Grid.create(width, height, initData);
+		OpenList.reserve((width + height) * 4);
 	}
 	void PathfinderAstar::Destroy()
 	{
@@ -88,10 +89,11 @@
 					OpenList.insert(n);
 				}
 
+				int size = OpenList.size();
+				if (size > MaxDepth) MaxDepth = size;
+
 				if (explored)
 				{
-					int size = OpenList.size();
-					if (size > MaxDepth) MaxDepth = size;
 					explored->push_back(ToScreenCoordCentered(head));
 					explored->push_back(ToScreenCoordCentered(n));
 				}
@@ -132,18 +134,22 @@
 	}
 	Vector2i PathfinderAstar::ToVirtualCoord(const Vector2& pos) const
 	{
-		return Vector2i(int(pos.x / CellSize), int(pos.y / CellSize));
+		return ToVirtualCoord(pos.x, pos.y);
 	}
 	Vector2i PathfinderAstar::ToVirtualCoord(float x, float y) const
 	{
-		return Vector2i(int(x / CellSize), int(y / CellSize));
+		//float cx = x - CellHalfSize, cy = y - CellHalfSize;
+		float cx = x, cy = y;
+		if (!InWorld(cx, cy))
+			return Vector2i(-1, -1);
+		return Vector2i(int(cx / CellSize), int(cy / CellSize));
 	}
 
 
-	bool PathfinderAstar::InWorld(const Vector2& pos) const
+	bool PathfinderAstar::InWorld(float x, float y) const
 	{
-		return 0.0f <= pos.x && pos.x < (Grid.Width * CellSize) 
-			&& 0.0f <= pos.y && pos.y < (Grid.Width * CellSize);
+		return 0.0f <= x && x < (Grid.Width  * CellSize) 
+			&& 0.0f <= y && y < (Grid.Height * CellSize);
 	}
 	bool PathfinderAstar::SetStart(const Vector2& worldXY) 
 	{

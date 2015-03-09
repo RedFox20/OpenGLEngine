@@ -77,8 +77,7 @@ namespace freetype
 
 
 	/**
-	 * A fontface describes a single truetype font file
-	 * The fontface contains 
+	 * @brief A fontface describes a single truetype font file
 	 */
 	struct FontFace
 	{
@@ -243,9 +242,9 @@ namespace freetype
 		GlyphAtlas atlas;	// container atlas of the glyphs
 		FontFace* face;		// TrueType fontface of this font
 		void* ftSize;		// freetype font size definition held by each Font
-		ushort height;		// font height in pixels
-		ushort dpi;			// font dpi
-		bool   is_sdf;      // is this a signed distance field font?
+		int height;			// font height in pixels
+		int dpi;			// font dpi
+		bool is_sdf;		// is this a signed distance field font?
 
 		inline Font() : face(0), ftSize(0), is_sdf(false) {}
 		inline ~Font() { Destroy(); }
@@ -266,7 +265,7 @@ namespace freetype
 		 *				FONT_OUTLINE - param is the outline width in sub-pixels (float)
 		 *				FONT_STROKE - param is the stroke width in sub-pixels (float)
 		 */
-		bool Create(FontFace* face, unsigned fontHeight, FontStyle style = FONT_PLAIN, float outlineOffset = 1.0f, int dpi = DefaultDPI);
+		bool Create(FontFace* face, int fontHeight, FontStyle style = FONT_PLAIN, float outlineOffset = 1.0f, int dpi = DefaultDPI);
 
 		/** Destroys this Font and its atlas */
 		void Destroy();

@@ -2,7 +2,7 @@
 #include "AstarNode.h"
 #include <vector>
 using std::vector;
-
+#include <assert.h>
 
 struct node_heap
 {
@@ -14,8 +14,9 @@ struct node_heap
 	node_heap() : Data(0), Size(0), Capacity(0)
 	{
 	}
-	node_heap(int capacity) : Data((T*)malloc(sizeof(T*)*capacity)), Size(0), Capacity(0)
+	node_heap(int capacity) : Data(0), Size(0), Capacity(0)
 	{
+		reserve(capacity);
 	}
 	node_heap(const node_heap& other)          = delete; // NOCOPY
 	node_heap& operator=(const node_heap& rhs) = delete; // NOCOPY
@@ -34,6 +35,17 @@ struct node_heap
 		fwd.Data = Data, fwd.Size = Size, fwd.Capacity = Capacity;
 		Data = p, Size = s, Capacity = c;
 		return *this;
+	}
+
+	void reserve(int capacity)
+	{
+		if (capacity > Capacity)
+		{
+			int cap = capacity;
+			if (int rem = cap % 8) // align up to 8
+				cap += 8 - rem;
+			Data = (T*)realloc(Data, sizeof(T)*(Capacity = cap));
+		}
 	}
 
 	__forceinline T& operator[](int index) { return Data[index]; }
@@ -95,43 +107,11 @@ struct node_heap
 
 	void insert(T item)
 	{
-		if (Size == Capacity)
-		{
-			int cap = Capacity;
-			cap += 4 + (cap >> 1);  // += 50%
-			if (int rem = cap % 8) // align up to 8
-				cap += 8 - rem;
-			Data = (T*)realloc(Data, sizeof(T)*(Capacity = cap));
-		}
-		insert_up(Data, Size++, item); // insert to back
+		int size = Size;
+		assert(size < Capacity);
 
-
-		//// swap first and last
-		//T* ptr = Data;
-		//const int size = ++Size;
-		//const int last = size - 1;
-		//int current    = 0;
-		//int child      = (current << 1) + 1; // left_child = i*2 + 1
-		//const int itemScore = item->FScore;
-
-		//while (child < size) // move downwards in the heap
-		//{
-		//	T dataChild = ptr[child];
-		//	if (child < last) // test if rightChild is a better option
-		//	{
-		//		T rightChild = ptr[child+1];
-		//		if (dataChild->FScore > rightChild->FScore)
-		//			dataChild = rightChild, ++child;
-		//	}
-		//	if (itemScore > dataChild->FScore)
-		//	{
-		//		ptr[current] = dataChild; // promote child to new parent
-		//		current = child; // move downwards
-		//		child   = (current << 1) + 1; // left_child = i*2 + 1
-		//	}
-		//	else break;
-		//}
-		//ptr[current] = item; // write the final value
+		insert_up(Data, size, item); // insert to back
+		++Size;
 	}
 
 	T pop()
@@ -232,10 +212,12 @@ struct node_heap
 	}
 };
 
+
+
+
 struct node_vect
 {
 	typedef AstarNode* T;
-	static_assert(sizeof(T) == 4, "min_vector<T> sizeof(T) must be 4 for optimization reasons");
 	T*  Data;
 	int Size;
 	int Capacity;
@@ -243,8 +225,9 @@ struct node_vect
 	node_vect() : Data(0), Size(0), Capacity(0)
 	{
 	}
-	node_vect(int capacity) : Data((T*) malloc(sizeof(T)*capacity)), Size(0), Capacity(0)
+	node_vect(int capacity) : Data(0), Size(0), Capacity(0)
 	{
+		reserve(capacity);
 	}
 	node_vect(const node_vect& other) = delete; // NOCOPY
 	node_vect& operator=(const node_vect& rhs) = delete; // NOCOPY
@@ -259,10 +242,22 @@ struct node_vect
 	}
 	node_vect& operator=(node_vect&& fwd)
 	{
-		T* p = fwd.Data; int s = fwd.Size, c = fwd.Capacity;
+		auto* p = fwd.Data; int s = fwd.Size, c = fwd.Capacity;
 		fwd.Data = Data, fwd.Size = Size, fwd.Capacity = Capacity;
 		Data = p, Size = s, Capacity = c;
 		return *this;
+	}
+
+	void reserve(int capacity)
+	{
+		if (capacity > Capacity)
+		{
+			int cap = capacity;
+			if (int rem = cap % 8) // align up to 8
+				cap += 8 - rem;
+			int newBytes = sizeof(T) * (Capacity = cap) + 32; // extra bytes for faster ptr_shift
+			Data = (T*)realloc(Data, newBytes);
+		}
 	}
 
 	__forceinline T& operator[](int index) { return Data[index]; }
@@ -271,114 +266,33 @@ struct node_vect
 	__forceinline bool empty() const { return Size == 0; }
 	__forceinline void clear() { Size = 0; }
 
-	//// @warning This algorithm always overflows by design to increase speed
-	////          so it's only useful for shifting the entire array
-	static void ptr_shift(T* ptr, int count)
-	{
-		T* p = ptr;
-		int n = count;
-		if (n >= 8)
-		{
-			__m128 prev1 = _mm_loadu_ps((float*) p);
-			__m128 prev2 = _mm_loadu_ps((float*) p + 4);
-			do
-			{
-				__m128 next1 = _mm_loadu_ps((float*) p + 8);
-				__m128 next2 = _mm_loadu_ps((float*) p + 12);
-				_mm_storeu_ps((float*) p + 1, prev1);
-				_mm_storeu_ps((float*) p + 5, prev2);
-				prev1 = next1;
-				prev2 = next2;
-				p += 8;
-				n -= 8;
-			} while (n >= 8);
-			_mm_storeu_ps((float*) p + 1, prev1);
-			_mm_storeu_ps((float*) p + 5, prev2);
-		}
-		else if (n >= 4) // max 7 bytes
-		{
-			__m128 prev1 = _mm_loadu_ps((float*) p);
-			__m128 prev2 = _mm_loadu_ps((float*) p + 4);
-			_mm_storeu_ps((float*) p + 1, prev1);
-			_mm_storeu_ps((float*) p + 5, prev2);
-		}
-		else // max 3 bytes
-		{
-			_mm_storeu_ps((float*) p + 1, _mm_loadu_ps((float*) p));
-		}
-	}
-	//// @warning This algorithm always overflows by design to increase speed
-	////          so it's only useful for shifting the entire array
-	static void ptr_unshift(T* ptr, int count)
-	{
-		T* p = ptr;
-		int n = count;
-		if (n >= 8)
-		{
-			__m128 prev1 = _mm_loadu_ps((float*) p);
-			__m128 prev2 = _mm_loadu_ps((float*) p + 4);
-			do
-			{
-				__m128 next1 = _mm_loadu_ps((float*) p + 8);
-				__m128 next2 = _mm_loadu_ps((float*) p + 12);
-				_mm_storeu_ps((float*) p - 1, prev1);
-				_mm_storeu_ps((float*) p + 3, prev2);
-				prev1 = next1;
-				prev2 = next2;
-				p += 8;
-				n -= 8;
-			} while (n >= 8);
-			_mm_storeu_ps((float*) p - 1, prev1);
-			_mm_storeu_ps((float*) p + 3, prev2);
-		}
-		else if (n >= 4) // max 7 bytes
-		{
-			__m128 prev1 = _mm_loadu_ps((float*) p);
-			__m128 prev2 = _mm_loadu_ps((float*) p + 4);
-			_mm_storeu_ps((float*) p - 1, prev1);
-			_mm_storeu_ps((float*) p + 3, prev2);
-		}
-		else // max 3 bytes
-		{
-			_mm_storeu_ps((float*) p - 1, _mm_loadu_ps((float*) p));
-		}
-	}
 
 	void insert(T item)
 	{
 		int size = Size;
-		if (size == Capacity)
+		assert(size < Capacity);
+
+		T* ptr = Data;
+		const int itemValue = item->FScore;
+		int imax = size;
+		int imin = 0;
+		while (imin < imax) // binary search for appropriate index
 		{
-			int cap = Capacity;
-			cap += 4 + (cap >> 1);  // += 50%
-			if (int rem = cap % 8) // align up to 8
-				cap += 8 - rem;
-			int newBytes = sizeof(T) * (Capacity = cap) + 32; // extra bytes for faster ptr_shift
-			Data = (T*) realloc(Data, newBytes);
+			int imid = (imin + imax) >> 1;
+			if (ptr[imid]->FScore > itemValue)
+				imin = ++imid;
+			else
+				imax = imid;
 		}
 
-		const int itemValue = item->FScore;
-		T* end = Data + size; // end of vector
-		T* rend = Data - 1;    // reverse end
-		T* ptr = end - 1;    // current pointer
-		for (; ptr > rend; --ptr)
-		{
-			// if last >= item, then we should insert
-			if ((*ptr)->FScore >= itemValue)
-			{
-				++Size;
-				++ptr;
-				if (int count = end - ptr)
-					ptr_shift(ptr, count);
-				*ptr = item;
-				return;
-			}
-		}
-		// well, insert to start of vector then :/
-		ptr = Data;
+		T* end = ptr + size;
+		ptr += imin;
 		++Size;
-		if (int count = end - ptr)
-			ptr_shift(ptr, count);
+		{ // ptr shift +1
+			T* p = end;
+			while (p != ptr)
+				--p, p[1] = *p;
+		}
 		*ptr = item;
 	}
 	inline T pop()
@@ -394,38 +308,15 @@ struct node_vect
 		{
 			if (*ptr == item)
 			{
+				{ // ptr shift -1
+					T* p = ptr;
+					while (p != end)
+						*p = p[1], ++p;
+				}
 				--Size;
-				++ptr;
-				if (int count = end - ptr)
-					ptr_unshift(ptr, count);
 				return;
 			}
 		}
-	}
-
-	inline int get_reposition_direction(T* ptr, T* rend, T* end, int itemScore)
-	{
-		T* prev = ptr - 1;
-		if (prev != rend)
-		{
-			// prevScore should always be GREATER or equal to itemScore
-			const int prevScore = (*prev)->FScore;
-			if (prevScore < itemScore)  return -1; // we have to move backwards
-			if (prevScore == itemScore) return 0;  // we can stay put, everything is sorted
-			// prevScore > itemScore
-			//   the backwards part of vector is sorted, but now we have to check if
-			//   nextScore is maybe incorrect:
-		}
-		T* next = ptr + 1;
-		if (next < end)
-		{
-			// nextScore must be SMALLER or equal to itemScore
-			if ((*next)->FScore <= itemScore) return 0; // we can stay put, everything is sorted
-			// nextScore > itemScore
-			//   the forward part of vector is not sorted
-			return +1; // we have to move forward
-		}
-		return 0; // by default we stay put
 	}
 
 	// instead of erase/insert, this function simply repositions
@@ -440,23 +331,38 @@ struct node_vect
 			if (*ptr == repoItem)
 			{
 				// now decide which way to shift it
-				int itemScore = repoItem->FScore;
-				int direction = get_reposition_direction(ptr, rend, end, itemScore);
-				if (direction < 0) // move backward until sorted
+				const int itemScore = repoItem->FScore;
+				T* prev = ptr - 1;
+				if (prev != rend)
 				{
-					// --ptr is guaranteed to be > rend
-					--ptr;
-					do // shift the item backward until sorted
+					// prevScore should always be GREATER or equal to itemScore
+					const int prevScore = (*prev)->FScore;
+					if (prevScore < itemScore)// we have to move backwards
 					{
-						T prevItem = *ptr;
-						if (prevItem->FScore >= itemScore) break; // it's finally sorted
-						*ptr   = repoItem;   // swap the items
-						ptr[1] = prevItem;
+						// --ptr is guaranteed to be > rend
 						--ptr;
-					} while (ptr > rend);
+						do // shift the item backward until sorted
+						{
+							T prevItem = *ptr;
+							if (prevItem->FScore >= itemScore) break; // it's finally sorted
+							*ptr   = repoItem;   // swap the items
+							ptr[1] = prevItem;
+							--ptr;
+						} while (ptr > rend);
+					}
+					if (prevScore == itemScore) return;  // we can stay put, everything is sorted
+					// prevScore > itemScore
+					//   the backwards part of vector is sorted, but now we have to check if
+					//   nextScore is maybe incorrect:
 				}
-				else if (direction > 0) // move forward until sorted
+				T* next = ptr + 1;
+				if (next < end)
 				{
+					// nextScore must be SMALLER or equal to itemScore
+					if ((*next)->FScore <= itemScore) return; // we can stay put, everything is sorted
+					// nextScore > itemScore
+					//   the forward part of vector is not sorted
+
 					// ++ptr is guaranteed to be < end
 					++ptr;
 					do // shift the item forward until sorted
@@ -558,23 +464,6 @@ template<class T> struct PfVector
 			_expand();
 		Data[Size++] = item;
 	}
-
-	//// inserts an item inside the vector at the current place
-	//void insert(T* ptr, const T& item)
-	//{
-	//	T* src;
-	//	if (Size == Capacity) // resize required
-	//	{
-	//		int offset = int(ptr - Data) / sizeof(T);
-	//		_expand();
-	//		src = Data + offset;
-	//	}
-	//	else 
-	//		src = ptr;
-	//	_shift(src);
-	//	*src = item;
-	//	++Size;
-	//}
 
 	// shifts the vector forward from this point
 	inline void _shift(T* src)

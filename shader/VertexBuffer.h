@@ -40,6 +40,23 @@ enum ShaderAttribute
 };
 
 
+/**
+ * @brief Built-in shader define slots
+ */
+enum ShaderDefine
+{
+	d_TextType,  // TextType_Raster, TextType_SDF, TextType_LCD
+	d_TextStyle, // TextStyle_Plain, TextStyle_
+	d_MaxShaderDefines,
+};
+
+enum TextType
+{
+	TextType_Raster, // simple raster fonts, require re-rendering for each font size
+	TextType_SDF,    // Signed Distance Field fonts, offering great clarity at different font sizes
+	TextType_LCD,    // LCD subpixel text rendering, also known as ClearType, require re-rendering for each font size
+};
+
 
 
 #pragma pack(push, 1)
@@ -319,6 +336,17 @@ template<class VERTEX>
 	 * @return Mapped address to client memory
 	 */
 	void* MapVBO(BufferMapType mapType = MAP_RO);
+
+
+	/**
+	 * @brief Maps a portion of this VertexBuffer into client memory
+	 * @param mapType Type of mapping to use R/W/RW
+	 * @param offset Offset where to start mapping from
+	 * @param size Size of mapped memory
+	 * @note UnmapVBO must be called after calling MapVBO (!)
+	 * @return Mapped adress to client memory
+	 */
+	void* MapVBO(int offset, int size, BufferMapType mapType = MAP_RO);
 
 
 	/**

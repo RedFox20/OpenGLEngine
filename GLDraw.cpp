@@ -13,7 +13,7 @@
 	float PackRGBA(const Vector4& rgba)
 	{
 		return rgba.dot(Vector4(
-			1.0f/(256.0f*256.0f*256.0),
+			1.0f/(256.0f*256.0f*256.0f),
 			1.0f/(256.0f*256.0f),
 			1.0f/(256.0f),
 			1.0f)
@@ -28,7 +28,7 @@
 	VertexIndexBuffer* GLDraw::CreateBuffer() const
 	{
 		VertexIndexBuffer* vib = new VertexIndexBuffer();
-		if(vertices.size())
+		if (vertices.size())
 		{
 			vib->Create<Vertex2ColorUnpacked>(BUFFER_STATIC);
 			vib->BufferVertices(&vertices[0], vertices.size());
@@ -71,10 +71,10 @@
 		// for very small widths, the core should be very small ~10%
 		// for large width, the core should be very large ~90%
 		float cr; // core radius
-		switch((int)width){
+		switch ((int)width) {
 		case 0: case 1: width += 0.5f; cr = 0.25f; break;
 		case 2: cr = 0.75f; break;
-		case 3: cr = 1.5f; break;
+		case 3: cr = 1.5f;  break;
 		default: cr = (width / 2.0f) - 1.0f; break; // always leave 1 pixel for the edge radius
 		}
 		float w2 = width / 2.0f;
@@ -83,7 +83,7 @@
 		right.normalize();
 		float ex = right.x * w2, ey = right.y * w2; // edge xy offsets
 		float cx = right.x * cr, cy = right.y * cr; // center xy offsets
-		size_t n = vertices.size();
+		int n = (int)vertices.size();
 		vertices.resize(n + 8);
 		Vertex2ColorUnpacked* v = &vertices[n];
 		v[0].x = x1 - ex, v[0].y = y1 - ey, v[0].rgba = colorz;	// left-top
@@ -95,7 +95,7 @@
 		v[6].x = x1 + ex, v[6].y = y1 + ey, v[6].rgba = colorz;	// right-top
 		v[7].x = x2 + ex, v[7].y = y2 + ey, v[7].rgba = colorz;	// right-bottom
 
-		size_t numIndices = indices.size();
+		auto numIndices = indices.size();
 		indices.resize(numIndices + 18);
 		Index* i = &indices[numIndices];
 		i[0] = n + 0, i[1] = n + 1, i[2] = n + 3; // triangle 1
@@ -169,7 +169,7 @@
 		//float rgba = PackRGBA(color);
 		float x1 = origin.x, x2 = origin.x + size.x;
 		float y1 = origin.y, y2 = origin.y + size.y;
-		size_t n = vertices.size();
+		int n = (int)vertices.size();
 		vertices.resize(n + 4);
 		Vertex2ColorUnpacked* v = &vertices[n];
 		v[0].x = x1, v[0].y = y2, v[0].rgba = color; // left-top
@@ -181,7 +181,7 @@
 		//v[1].x = x1, v[1].y = y1, v[1].rgba = rgba; // left-bottom
 		//v[2].x = x2, v[2].y = y1, v[2].rgba = rgba; // right-bottom
 		//v[3].x = x2, v[3].y = y2, v[3].rgba = rgba; // right-top
-		size_t numIndices = indices.size();
+		auto numIndices = indices.size();
 		indices.resize(numIndices + 6);
 		Index* i = &indices[numIndices];
 		i[0] = n + 0, i[1] = n + 1, i[2] = n + 2;	// triangle 1

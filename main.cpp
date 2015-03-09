@@ -19,7 +19,7 @@ using namespace freetype;
 #include <pathfinder/PathfinderTest.h>
 
 
-static const bool PathfinderTest = true;
+static const bool PathfinderTest = false;
 
 /////////////////////  game objects
 
@@ -104,6 +104,7 @@ static std::vector<Text*> Texts;
 static std::vector<GuiText*> GuiTexts;
 
 Vector2 gScreen; // this is used globally, so don't hide it with 'static'
+Vector2 gScreenCorrection; // GLUT doesn't report window client size, so we need a bit of correction
 
 static unsigned SID_SimpleShader;
 static unsigned SID_TextShader2D;
@@ -120,7 +121,8 @@ bool startup()
 	if (PathfinderTest)
 		glClearColor(0.15f, 0.15f, 0.15f, 1.0f); // clear background to soft black
 	else
-		glClearColor(1.0f, 1.0f, 1.0f, 1.0f); // pure white background
+		glClearColor(0.15f, 0.15f, 0.15f, 1.0f); // clear background to soft black
+		//glClearColor(1.0f, 1.0f, 1.0f, 1.0f); // pure white background
 	glEnable(GL_BLEND); // enable alpha mapping
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
@@ -329,9 +331,13 @@ void frame_start()
 	GameTimer.Start();
 	frame_enter(deltaTime);
 
+	// can't believe GLUT is a buggy POS and it renders into window itself, not its client area
+	// for that reason we need to do some screen size corrections
+	// ultimately we'll have to switch to native windows instead
+	Vector2 ortho{ (float)glutGet(GLUT_WINDOW_WIDTH), (float)glutGet(GLUT_WINDOW_HEIGHT) };
+	gScreen.w = ortho.w - gScreenCorrection.w;
+	gScreen.h = ortho.h - gScreenCorrection.h;
 
-	gScreen.w = (float)glutGet(GLUT_WINDOW_WIDTH);
-	gScreen.h = (float)glutGet(GLUT_WINDOW_HEIGHT);
 
 	// Clear Screen & Prepare 3D
 	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
@@ -346,7 +352,7 @@ void frame_start()
 	if (!PathfinderTest)
 	{
 		Shaders[SID_SimpleShader]->Bind();
-		for(const GameObject* obj : GameObjects)
+		for (const GameObject* obj : GameObjects)
 			obj->Draw(ViewProjection);
 	}
 
@@ -354,9 +360,8 @@ void frame_start()
 	glDisable(GL_CULL_FACE); // disable face culling
 
 	
-	ViewProjection = glm::ortho(0.0f, gScreen.w, 0.0f, gScreen.h, -1.0f, 1.0f);
+	ViewProjection = glm::ortho(0.0f, ortho.w, 0.0f, ortho.h, -1.0f, 1.0f);
 	{
-
 		if (PathfinderTest)
 		{
 			PathfinderTest::DrawScene(Shaders[SID_TextShader2D], Shaders[SID_ColorShader2D], ViewProjection);
@@ -400,11 +405,15 @@ int main(int argc, char** argv)
 
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_RGBA|GLUT_ALPHA|GLUT_DOUBLE|GLUT_DEPTH);
-	glutInitWindowSize(1280, 720);
-	glutCreateWindow("GL-Engine by Jorma Rebane");
-	gScreen.w = (float)glutGet(GLUT_WINDOW_WIDTH) - 8;
-	gScreen.h = (float)glutGet(GLUT_WINDOW_HEIGHT) - 8;
+	
 
+	gScreen.set(1280, 720);
+	RECT desired = { 0, 0, (int)gScreen.w, (int)gScreen.h };
+	AdjustWindowRect(&desired, WS_OVERLAPPEDWINDOW, 0);
+	Vector2i realSize(desired.right - desired.left, desired.bottom - desired.left);
+	gScreenCorrection.set((float)-desired.left, (float)-desired.left);
+	glutInitWindowSize(realSize.width, realSize.height);
+	glutCreateWindow("GL-Engine by Jorma Rebane");
 
 	GLenum glew_status = glewInit();
 	if (glew_status != GLEW_OK)

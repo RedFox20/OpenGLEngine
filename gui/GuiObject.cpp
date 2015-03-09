@@ -18,7 +18,7 @@
 		glm::mat4 R = glm::rotate(rot, 0.0f, 0.0f, 1.0f); // rotate around z axis
 		glm::mat4 S = glm::scale(scl.x, scl.y, 1.0f); // no scaling in z axis
 		glm::mat4 P = glm::translate(pos.x, pos.y, z); // add the z depth component
-		out = P * S * R; // affine transform
+		out = P * R; // affine transform
 	}
 
 	// moves the object in the global coordinate space by the given offset

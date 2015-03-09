@@ -2,15 +2,12 @@
  * Copyright (c) 2013 - Jorma Rebane
  */
 #include "PathfinderTest.h"
-
 #include "Input.h"
 #include "Timer.h"
 #include <gui/GuiObject.h>
 #include <gui/freetype.h>
-
 #include <vector>
 using std::vector;
-
 #include "PathfinderAstar.h"
 
 static GuiOverlay GridOverlay;
@@ -36,38 +33,44 @@ static Vector3 SlateBlue(0.28f, 0.35f, 0.67f);			// Dark Slate Blue (dark soft v
 
 static freetype::FontFace* MonoFace = NULL;
 static freetype::Font* MonoFont = NULL;
+static Vector4* Selection = NULL;
 
 static void OnMouseButton(int button, bool down, bool doubleClick)
 {
-	if(!down) { // on mouse up
-		Vector2 pos(mouseX() - WorldPos.x, gScreen.h - mouseY() - WorldPos.y);
-		if(button == MBLEFT) 
+	if (!down) // on mouse up
+	{
+		Vector2 mouse((float)mouseX(), gScreen.h - mouseY() - 1);
+		Vector2 pos = mouse - WorldPos;
+		if (button == MBLEFT) 
 		{
-			if(Finder.SetStart(pos)) PathChanged = true;
+			if (Finder.SetStart(pos)) PathChanged = true;
 		}
-		else if(button == MBRIGHT) 
+		else if (button == MBRIGHT) 
 		{
-			if(Finder.SetEnd(pos)) PathChanged = true;
+			if (Finder.SetEnd(pos)) PathChanged = true;
 		}
 	}
 }
 
-Vector4* selection = NULL;
 static void OnMouseMove(int relX, int relY, int relZ)
 {
 	static Vector4 sel;
 	if (relX || relY)
 	{
-		Vector2 pos(mouseX() - WorldPos.x, gScreen.h - mouseY() - WorldPos.y);
+		Vector2 mouse((float)mouseX(), gScreen.h - mouseY() - 1);
+		Vector2 pos = mouse - WorldPos;
 		Vector2i vpos = Finder.ToVirtualCoord(pos);
+		printf("mx %.0f, my %.0f\n", mouse.x, mouse.y);
+		printf("px %.0f, py %.0f\n", pos.x, pos.y);
+		printf("vx %d, vy %d\n", vpos.x, vpos.y);
 
 		if (AstarNode* node = Finder.Grid.get(vpos.x, vpos.y))
 		{
 			sel.set((float)node->X, (float)node->Y, 1.0f, 1.0f);
 			sel *= Finder.CellSize;
-			selection = &sel;
+			Selection = &sel;
 		}
-		else selection = NULL;
+		else Selection = NULL;
 	}
 }
 
@@ -76,36 +79,33 @@ static void OnMouseMove(int relX, int relY, int relZ)
 
 void PathfinderStressTest()
 {
+	const char* container = typeid(PfOpenList).name() + 7; // skip "struct "
 	int width  = Finder.Grid.Width;
 	int height = Finder.Grid.Height;
-
-	const char* container = typeid(PfOpenList).name() + 7; // skip "struct "
 	PfVector<Vector2> path;
-
 	Finder.SetStart(0, 0);
 	int opens = 0;
 	int reopens = 0;
-	double pfElapsed = Timer::Measure([&]() {
-		#if _DEBUG
-		const int iterations = 5;
-		#else
-		const int iterations = 50;
-		#endif
+#if _DEBUG
+	const int iterations = 5;
+#else
+	const int iterations = 50;
+#endif
+
+	double pfElapsed = Timer::Measure([&]()
+	{
+
 		for (int i = 0; i < iterations; ++i)
+		for (int x = 0; x < width;  ++x)
+		for (int y = 0; y < height; ++y)
 		{
-			for(int x = 0; x < width; ++x)
+			Finder.SetEnd(x, y);
+			if (Finder.Start && Finder.End)
 			{
-				for(int y = 0; y < height; ++y)
-				{
-					Finder.SetEnd(x, y);
-					if (Finder.Start && Finder.End)
-					{
-						Finder.Process(path, NULL);
-						path.clear();
-						opens += Finder.NumOpened;
-						reopens += Finder.NumReopened;
-					}
-				}
+				Finder.Process(path, NULL);
+				path.clear();
+				opens   += Finder.NumOpened;
+				reopens += Finder.NumReopened;
 			}
 		}
 	});
@@ -142,7 +142,6 @@ void PathfinderTest::Create()
 	});
 	printf("Pathfinder init: %fs\n", tCreate);
 
-
 	WorldSize.set(world.width * CELLSIZE, world.height * CELLSIZE);
 
 	// initialize the visual representation of the world
@@ -162,20 +161,20 @@ void PathfinderTest::Create()
 
 	Vector2 origin(Vector2::ZERO); 
 	Vector2 size(CELLSIZE, CELLSIZE);
-	double tOverlay = Timer::Measure([&](){
-		for(int x = 0; x < world.width; x++)
+	double tOverlay = Timer::Measure([&]()
+	{
+		for (int y = 0; y < world.height; ++y)
 		{
-			for(int y = 0; y < world.height; y++)
+			for (int x = 0; x < world.width; ++x)
 			{
-				AstarNode& node = Finder.Grid.Nodes[x * world.width + y];
+				origin.set(x * size.x, y * size.y);
+				AstarNode& node = Finder.Grid.Nodes[y * world.width + x];
 				gridOverlay.FillRect(origin, size, planeColors[node.Plane]);
-				if(node.Plane != 1) // no grid for obstructed areas
+				if (node.Plane != 1) // no grid for obstructed areas
 					gridOverlay.RectAA(origin, size, Vector4(planeColors[node.Plane].rgb * 2.0f, 0.5f)); // brighter transparent
-				origin.y += CELLSIZE;
 			}
-			origin.x += CELLSIZE;
-			origin.y = 0.0f;
 		}
+
 		GridOverlay.Create(gridOverlay);
 	});
 
@@ -196,7 +195,7 @@ void PathfinderTest::Create()
 	// load fonts & generate text
 	MonoFace = new freetype::FontFace("fonts/DejaVuSansMono.ttf");
 	MonoFont = MonoFace->NewFont(10, freetype::FONT_SHADOW, 1.0f);
-	GridMinText.Create(MonoFont, L"0, 0");
+	GridMinText.CreateF(MonoFont, L"0, 0");
 	GridMaxText.CreateF(MonoFont, L"%d, %d", world.width, world.height);
 
 	PathfinderStressTest();
@@ -219,15 +218,16 @@ void PathfinderTest::Destroy()
 
 void PathfinderTest::DrawScene(ShaderProgram* ts, ShaderProgram* gui, const Matrix4& projection)
 {
-	float X = WorldPos.x = ((gScreen.w - WorldSize.x - Finder.CellHalfSize) / 2);
-	float Y = WorldPos.y = ((gScreen.h - WorldSize.y - Finder.CellHalfSize) / 2);
+	//float X = WorldPos.x = 0;
+	//float Y = WorldPos.y = 0;
+	float X = WorldPos.x = ((gScreen.w - WorldSize.x) / 2);
+	float Y = WorldPos.y = ((gScreen.h - WorldSize.y) / 2);
 
-	if(PathChanged && Finder.Start && Finder.End)
+	if (PathChanged && Finder.Start && Finder.End)
 	{
 		PfVector<Vector2> path;
 		PfVector<Vector2> explored;
 
-		Timer time(tstart);
 		double pfElapsed = Timer::Measure([&]() {
 			if (true) // debug
 				Finder.Process(path, &explored);
@@ -250,7 +250,7 @@ void PathfinderTest::DrawScene(ShaderProgram* ts, ShaderProgram* gui, const Matr
 		{
 			auto a = path.begin();
 			auto b = path.begin() + 1;
-			for(; b != path.end(); ++numLinks) // red 'path' lines
+			for (; b != path.end(); ++numLinks) // red 'path' lines
 				debugOverlay.LineAA(*a++, *b++, RedPath, 3.0f);
 		}
 
@@ -264,7 +264,7 @@ void PathfinderTest::DrawScene(ShaderProgram* ts, ShaderProgram* gui, const Matr
 			L"  opens   %d\n"
 			L"  reopens %d\n"
 			L"  links   %d\n",
-			int(pfElapsed*1000),int(pfElapsed*1000000), Finder.NumOpened, Finder.NumReopened, numLinks);
+			int(pfElapsed*1000), int(pfElapsed*1000000), Finder.NumOpened, Finder.NumReopened, numLinks);
 	}
 
 	gui->Bind(); // overlay graphics
@@ -281,9 +281,9 @@ void PathfinderTest::DrawScene(ShaderProgram* ts, ShaderProgram* gui, const Matr
 			EndMarker.SetPosition(WorldPos + Finder.ToScreenCoord(Finder.End));
 			EndMarker.Draw(projection);
 		}
-		if (selection) {
+		if (Selection) {
 			GLDraw selMarker;
-			selMarker.RectAA(selection->xy, selection->zw, Vector4(1.0f, 0.2f, 0.2f, 0.66f), 2.0f);
+			selMarker.RectAA(Selection->xy, Selection->zw, Vector4(1.0f, 0.2f, 0.2f, 0.66f), 2.0f);
 			GuiOverlay selOvl; selOvl.Create(selMarker);
 			selOvl.SetPosition(WorldPos);
 			selOvl.Draw(projection);

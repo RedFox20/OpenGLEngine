@@ -142,6 +142,22 @@ static const VertexBuffer* CurrentIndexBuffer  = NULL;
 
 
 	/**
+	 * @brief Maps a portion of this VertexBuffer into client memory
+	 * @param mapType Type of mapping to use R/W/RW
+	 * @param offset Offset where to start mapping from
+	 * @param size Size of mapped memory
+	 * @note UnmapVBO must be called after calling MapVBO (!)
+	 * @return Mapped adress to client memory
+	 */
+	void* VertexBuffer::MapVBO(int offset, int size, BufferMapType mapType)
+	{
+		BindVertexBuffer();
+		GLenum access[] = { GL_READ_ONLY, GL_WRITE_ONLY, GL_READ_WRITE };
+		return glMapBufferRange(GL_ARRAY_BUFFER, offset, size, access[mapType]);
+	}
+
+
+	/**
 	 * @brief Unmaps the VertexBuffer from client memory
 	 * @note Must be called after using MapVBO (!)
 	 */

@@ -1,6 +1,5 @@
 /**
  * Copyright (c) 2013 - Jorma Rebane
- * A cross-platform timer
  */
 #pragma once
 #ifndef TIMER_H

@@ -259,7 +259,7 @@ namespace freetype
 
 		this->font = font;
 		SelectFaceSize();
-		font->is_sdf = false;
+		font->is_sdf = true;
 
 		FT_Face face = FT_Face(font->face->ftFace);
 		uint maxGlyphWidth = ((face->bbox.xMax - face->bbox.xMin) * (fontHeight+1)) / face->units_per_EM;

@@ -5,7 +5,7 @@
 #ifndef PATHFINDER_TEST_H
 #define PATHFINDER_TEST_H
 
-#include "ShaderProgram.h"
+#include "shader/ShaderProgram.h"
 
 extern Vector2 gScreen; // current screen size
 

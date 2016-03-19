@@ -263,12 +263,12 @@
 			BitmapFileHeader bmfV5 = { 19778, HSize + paddedSize, 0, HSize,	};
 			BitmapV5InfoHeader bmiV5 = { {
 					sizeof(BitmapV5InfoHeader), // size of the V5 struct
-					width, height,		// height of the image - negative for top-down bitmap
-					1, 8, 0,					// 1 plane, 8bpp, BI_RGB(uncompressed)
-					paddedSize,					// image data size
-					3780, 3780,					// X/YPelsPerMeter
-					256, 0						// 256 colors in the color table, all colors
-				}, 0, // set rest to 0
+					width, height,  // height of the image - negative for top-down bitmap
+					ushort(1), ushort(8u), 0u,	// 1 plane, 8bpp, BI_RGB(uncompressed)
+					uint(paddedSize),			// image data size
+					3780u, 3780u,				// X/YPelsPerMeter
+					256u, 0u					// 256 colors in the color table, all colors
+				}, 0u, // set rest to 0
 			};
 			bmiV5.CSType = 'sRGB';	// sRGB colorspace
 			bmiV5.Intent = 8;		// LCS_GM_ABS_COLORIMETRIC - use nearest palette match
@@ -279,14 +279,14 @@
 		}
 		else
 		{
-			BitmapFileHeader bmf = { 19778, 54 + paddedSize, 0, 54, };
+			BitmapFileHeader bmf = { 19778u, uint(54 + paddedSize), 0, 54, };
 			BitmapInfoHeader bmi = {
 				sizeof(BitmapInfoHeader),	// size of this struct
-				width, height,		// height of the image - negative for top-down bitmap
-				1, channels*8, 0,			// 1 plane, number of bits: 8/24/32, BI_RGB(uncompressed)
-				paddedSize,					// size of image
-				3780, 3780,					// X/YPelsPerMeter
-				0, 0,						// No colortable
+				width, height,					 // height of the image - negative for top-down bitmap
+				ushort(1), ushort(channels*8),0u,// 1 plane, number of bits: 8/24/32, BI_RGB(uncompressed)
+				uint(paddedSize),				 // size of image
+				3780u, 3780u,					 // X/YPelsPerMeter
+				0u, 0u,							 // No colortable
 			};
 			fwrite(&bmf, sizeof(bmf), 1, file);
 			fwrite(&bmi, sizeof(bmi), 1, file);

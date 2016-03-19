@@ -26,7 +26,7 @@ struct ShaderDefines
 	/** @brief Remove this definition */
 	void Remove(ShaderDefine key);
 	bool IsDefined(ShaderDefine key) const;
-	bool GetValue(ShaderDefine key)  const;
+	int  GetValue(ShaderDefine key)  const;
 	const Def& operator[](ShaderDefine key) const;
 };
 

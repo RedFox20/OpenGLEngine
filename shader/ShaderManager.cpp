@@ -24,7 +24,7 @@ bool ShaderDefines::IsDefined(ShaderDefine key) const
 {
 	return !!Defines[key].defined;
 }
-bool ShaderDefines::GetValue(ShaderDefine key)  const
+int ShaderDefines::GetValue(ShaderDefine key)  const
 {
 	auto& d = Defines[key];
 	return d.defined ? d.value : 0;

@@ -259,7 +259,7 @@ namespace freetype
 
 		this->font = font;
 		SelectFaceSize();
-		font->is_sdf = true;
+		font->is_sdf = false;
 
 		FT_Face face = FT_Face(font->face->ftFace);
 		uint maxGlyphWidth = ((face->bbox.xMax - face->bbox.xMin) * (fontHeight+1)) / face->units_per_EM;
@@ -332,8 +332,8 @@ namespace freetype
 		// SDF fonts use 1 channel
 		int channels = font->is_sdf ? 1 : (style == FONT_SHADOW || style == FONT_STROKE) ? 2 : 1;
 
-		/// create a temp buffer image for blitting the shadows and outlines
-		/// @note Remember - shadows/strokes mustn't fall under the main channel, so they're blitted.
+		// create a temp buffer image for blitting the shadows and outlines
+		// @note Remember - shadows/strokes mustn't fall under the main channel, so they're blitted.
 		BufferImage image(mWidth, mHeight, channels);
 
 		// now for each glyph, we render it into the texture

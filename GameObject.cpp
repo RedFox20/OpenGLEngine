@@ -48,7 +48,9 @@
 	void GameObject::Draw(const Matrix4& viewProjection) const
 	{
 		ShaderProgram* shader = ShaderProgram::CurrentShader();
-		Matrix4 transform; AffineTransform(transform);
+
+		Matrix4 transform; 
+		AffineTransform(transform);
 		shader->BindMatrix(viewProjection * transform); // upload matrix to the shader
 		shader->BindTexture(texture);
 		shader->Draw(vbuffer);							// draw the vbuffer

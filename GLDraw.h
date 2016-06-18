@@ -5,7 +5,7 @@
 #ifndef GLDRAW_H
 #define GLDRAW_H
 
-#include "VertexBuffer.h"
+#include "shader/VertexBuffer.h"
 #include <vector>
 using std::vector;
 

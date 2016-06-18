@@ -5,15 +5,15 @@
 #ifndef GUIOBJECT_H
 #define GUIOBJECT_H
 
-#include "VertexBuffer.h"
+#include "shader/VertexBuffer.h"
 #include "Texture.h"
 #include <gui/freetype.h>
 #include "GLDraw.h"
 
 enum GuiObjectType {
-	GUIOBJECT = 1<<0,
+	GUIOBJECT  = 1<<0,
 	GUIGRAPHIC = 1<<1,
-	GUITEXT = 1<<2,
+	GUITEXT    = 1<<2,
 };
 
 // base GUI object with some basic

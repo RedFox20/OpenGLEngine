@@ -21,3 +21,7 @@
 /bin/data/Thumbs.db
 /freetype254
 /OpenGLEngine.opensdf
+OpenGLEngine.VC.VC.opendb
+OpenGLEngine.VC.db
+bin/OpenGLEngine.iobj
+bin/OpenGLEngine.ipdb

@@ -9,7 +9,7 @@
 #include "GL\glm\gtx\transform.hpp" // perspective, lookAt
 
 // engine specifics:
-#include "ShaderProgram.h"
+#include "shader/ShaderProgram.h"
 #include "Timer.h"
 #include <gui/GuiObject.h>
 #include "GameObject.h"
@@ -19,7 +19,7 @@ using namespace freetype;
 #include <pathfinder/PathfinderTest.h>
 
 
-static const bool PathfinderTest = false;
+static const bool PathfinderTest = true;
 
 /////////////////////  game objects
 
@@ -391,8 +391,12 @@ void frame_start()
 	AvgGameTime = (AvgGameTime + (float)GameTimer.StopElapsed()) * 0.5f;
 }
 
-
 ////////////////
+
+void window_reshaped(int x, int y)
+{
+    printf("window_reshaped: %d, %d\n", x, y);
+}
 
 int main(int argc, char** argv)
 {
@@ -404,8 +408,8 @@ int main(int argc, char** argv)
 	}
 
 	glutInit(&argc, argv);
+	glutReshapeFunc(&window_reshaped);
 	glutInitDisplayMode(GLUT_RGBA|GLUT_ALPHA|GLUT_DOUBLE|GLUT_DEPTH);
-	
 
 	gScreen.set(1280, 720);
 	RECT desired = { 0, 0, (int)gScreen.w, (int)gScreen.h };

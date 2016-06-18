@@ -6,7 +6,7 @@
 #define FREETYPE_CPP_H
 
 #include <vector>
-#include "ShaderProgram.h"
+#include "shader/ShaderProgram.h"
 
 namespace freetype
 {

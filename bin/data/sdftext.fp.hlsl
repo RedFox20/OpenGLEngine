@@ -1,5 +1,5 @@
-#define WHATEVER 1
 #version 140 // OpenGL 3.1 
+#define WHATEVER 1
 //varying vec2 vCoord;			// vertex texture coordinates 
 //uniform sampler2D diffuseTex;	// alpha mapped texture 
 //uniform vec4 diffuseColor;		// actual color for this text 
